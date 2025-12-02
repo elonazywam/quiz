@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Wybierz Kategorię</title>
+    <style>
+        /* CSS: Stylizowanie strony - Ciemny motyw */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50; /* CIEMNE TŁO */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #ecf0f1; /* JASNY TEKST NA CIEMNYM TLE */
+        }
+        .quiz-container {
+            background-color: #34495e; /* Lekko jaśniejsze tło kontenera quizu */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7); /* Wyraźniejszy cień dla ciemnego tła */
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #f1c40f; /* JASNY ŻÓŁTY TYTUŁ */
+            margin-bottom: 20px;
+        }
+        
+        /* Główne menu nawigacyjne */
+        .main-nav {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 10px;
+        }
+        .main-nav button {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #bdc3c7; /* JASNOSZARY DLA PRZYCISKÓW MENU */
+            transition: color 0.2s;
+        }
+        .main-nav button:hover {
+            color: #ecf0f1;
+        }
+
+        /* Sekcja Quizu i Opcje */
+        .symbol-display {
+            font-size: 80px;
+            margin: 20px 0;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 10px;
+            height: 100px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #f1c40f; /* Kolor symbolu/pytajnika */
+        }
+        .options button, .menu button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #2980b9; /* CIEMNIEJSZY NIEBIESKI PRZYCISK */
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .options button:hover, .menu button:hover {
+            background-color: #3498db;
+        }
+
+        /* Styl dla sekcji "O nas" */
+        #aboutContent {
+            text-align: left;
+            padding-top: 15px;
+        }
+        #aboutContent p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        #aboutContent ul {
+            list-style: disc;
+            margin-left: 20px;
+            padding-left: 0;
+        }
+
+        /* Style dla informacji zwrotnej i wyniku */
+        .feedback {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 25px; 
+        }
+        .correct { color: #2ecc71; } /* JASNA ZIELEŃ */
+        .incorrect { color: #e74c3c; } /* JASNA CZERWIEŃ */
+        .score { margin-top: 15px; font-size: 16px; }
+        #quizContent { display: none; }
+        #aboutContent { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        
+        <div class="main-nav">
+            <button onclick="showSection('menu')">Główna strona (Quiz)</button>
+            <button onclick="showSection('about')">O projekcie</button>
+        </div>
+
+        <h1 id="mainTitle">Wybierz Kategorię Quizu</h1>
+        
+        <div id="menu">
+            </div>
+        
+        <div id="aboutContent">
+            <h2>ℹ️ Informacje o Projekcie Quizu</h2>
+            <p>Witaj w naszym interaktywnym quizie opartym na rozpoznawaniu symboli! Projekt ten ma na celu połączenie edukacji z zabawą, pozwalając na szybką naukę i testowanie wiedzy o flagach, ikonach i emotikonach.</p>
+
+            <h3>🎯 Cel Projektu</h3>
+            <ul>
+                <li>Edukacja wizualna: Rozwijanie umiejętności szybkiego rozpoznawania symboli.</li>
+                <li>Rozrywka: Dostarczenie ciekawej i wciągającej formy spędzania czasu.</li>
+                <li>Demonstracja technologii: Pokazanie, jak proste strony internetowe mogą być w pełni interaktywne bez potrzeby korzystania z zewnętrznych serwerów.</li>
+            </ul>
+
+            <h3>💻 Technologie</h3>
+            <p>Quiz został zbudowany w całości w jednym pliku `quiz.html`, używając trzech podstawowych technologii webowych:</p>
+            <ul>
+                <li>HTML (HyperText Markup Language): Struktura i układ strony (np. tytuły, przyciski).</li>
+                <li>CSS (Cascading Style Sheets): Wygląd i styl (np. ciemne tło, kolor przycisków).</li>
+                <li>JavaScript (JS): Logika i interaktywność (np. mieszanie pytań, sprawdzanie odpowiedzi, liczenie punktów i przełączanie widoków).</li>
+            </ul>
+
+            <h3>🧑‍💻 Twórca</h3>
+            <p>Kod bazowy został stworzony przy wsparciu sztucznej inteligencji **Gemini (Flash 2.5)**. Jesteśmy dumni, że mogliśmy wspólnie stworzyć to narzędzie, które działa na Twoim systemie **Ubuntu**.</p>
+        </div>
+
+
+        <div id="quizContent">
+            <p>Jaki symbol reprezentuje:</p>
+            <div id="questionText" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
+            
+            <div id="symbolDisplay" class="symbol-display">?</div>
+
+            <div id="options" class="options">
+                </div>
+
+            <div id="feedback" class="feedback"></div>
+
+            <div id="score" class="score">Wynik: 0 / 0</div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript: Logika zarządzania sekcjami i quizem
+        
+        // --- BAZA PYTAŃ ---
+        const allQuizData = {
+            "Kraje (Flagi)": [
+                { name: "Polska", symbol: "🇵🇱" },
+                { name: "Niemcy", symbol: "🇩🇪" },
+                { name: "Włochy", symbol: "🇮🇹" },
+                { name: "Hiszpania", symbol: "🇪🇸" },
+                { name: "Francja", symbol: "🇫🇷" },
+            ],
+            "Zwierzęta (Emoji)": [
+                { name: "Pies", symbol: "🐶" },
+                { name: "Kot", symbol: "🐱" },
+                { name: "Lew", symbol: "🦁" },
+                { name: "Żółw", symbol: "🐢" },
+                { name: "Pszczoła", symbol: "🐝" },
+            ],
+            "Jedzenie i Picie": [
+                { name: "Pizza", symbol: "🍕" },
+                { name: "Kawa", symbol: "☕" },
+                { name: "Hamburger", symbol: "🍔" },
+                { name: "Lody", symbol: "🍦" },
+                { name: "Wino", symbol: "🍷" },
+            ]
+        };
+        // ------------------
+
+        let currentQuizData = []; 
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = 0;
+
+        // Elementy DOM
+        const menuContainer = document.getElementById('menu');
+        const quizContent = document.getElementById('quizContent');
+        const aboutContent = document.getElementById('aboutContent');
+        const mainTitle = document.getElementById('mainTitle');
+        const questionTextElement = document.getElementById('questionText');
+        const symbolDisplayElement = document.getElementById('symbolDisplay');
+        const optionsContainer = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+
+        // --- GŁÓWNA FUNKCJA ZARZĄDZANIA WIDOKAMI ---
+        function showSection(sectionId) {
+            // Ukrywa wszystkie sekcje
+            menuContainer.style.display = 'none';
+            quizContent.style.display = 'none';
+            aboutContent.style.display = 'none';
+            
+            // Pokazuje tylko wybraną sekcję
+            if (sectionId === 'menu') {
+                showMenu();
+                menuContainer.style.display = 'block';
+            } else if (sectionId === 'about') {
+                mainTitle.textContent = "Informacje o projekcie";
+                aboutContent.style.display = 'block';
+            }
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- FUNKCJA WYSWIETLA MENU ---
+        function showMenu() {
+            mainTitle.textContent = "Wybierz Kategorię Quizu";
+            menuContainer.innerHTML = '';
+            
+            Object.keys(allQuizData).forEach(categoryName => {
+                const button = document.createElement('button');
+                button.textContent = categoryName;
+                button.onclick = () => startQuiz(categoryName); 
+                menuContainer.appendChild(button);
+            });
+        }
+
+        function startQuiz(categoryName) {
+            currentQuizData = allQuizData[categoryName];
+            shuffleArray(currentQuizData);
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = 0;
+
+            mainTitle.textContent = categoryName;
+            menuContainer.style.display = 'none'; 
+            aboutContent.style.display = 'none';
+            quizContent.style.display = 'block';
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= currentQuizData.length) {
+                // Koniec quizu
+                questionTextElement.textContent = "Koniec Quizu!";
+                symbolDisplayElement.textContent = "🎉";
+                optionsContainer.innerHTML = '<p>Twój końcowy wynik to: ' + score + ' / ' + currentQuizData.length + '</p><button onclick="showSection(\'menu\')">Wróć do Menu</button>';
+                feedbackElement.textContent = "";
+                return;
+            }
+
+            totalQuestions++;
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            questionTextElement.textContent = currentQuestion.name;
+            symbolDisplayElement.textContent = "?"; 
+            optionsContainer.innerHTML = '';
+            feedbackElement.textContent = '';
+            
+            let options = [currentQuestion.symbol];
+            
+            let incorrectSymbols = [];
+            // Losowanie fałszywych odpowiedzi ze WSZYSTKICH pytań, oprócz bieżącego
+            Object.values(allQuizData).forEach(dataArray => {
+                dataArray.forEach(item => {
+                    if (item.symbol !== currentQuestion.symbol) {
+                        incorrectSymbols.push(item.symbol);
+                    }
+                });
+            });
+            
+            shuffleArray(incorrectSymbols);
+            options = options.concat(incorrectSymbols.slice(0, 3));
+            
+            shuffleArray(options); 
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(button, option, currentQuestion.symbol);
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol) {
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+            });
+            
+            symbolDisplayElement.textContent = correctAnswerSymbol; 
+
+            if (selectedSymbol === correctAnswerSymbol) {
+                feedbackElement.textContent = "✅ Dobrze!";
+                feedbackElement.className = "feedback correct";
+                clickedButton.style.backgroundColor = "#2ecc71"; 
+                score++;
+            } else {
+                feedbackElement.textContent = "❌ Źle! Poprawny to " + correctAnswerSymbol;
+                feedbackElement.className = "feedback incorrect";
+                clickedButton.style.backgroundColor = "#e74c3c"; 
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswerSymbol) {
+                        button.style.backgroundColor = "#2ecc71";
+                    }
+                });
+            }
+
+            scoreElement.textContent = `Wynik: ${score} / ${totalQuestions}`;
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        // Uruchomienie menu przy ładowaniu strony
+        window.onload = () => showSection('menu');
+    </script>
+
+</body>
+</html>
