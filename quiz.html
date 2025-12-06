@@ -22,7 +22,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0; 
+            margin: 0; i
             color: #ecf0f1; 
             position: relative;
         }
@@ -281,19 +281,33 @@
             Object.keys(allQuizData).forEach(categoryName => {
                 const button = document.createElement('button');
                 button.textContent = categoryName;
-                button.onclick = () => startQuiz(categoryName); 
+                button.onclick = () => showDifficulty(categoryName); 
                 menuContainer.appendChild(button);
             });
         }
 
-        function startQuiz(categoryName) {
+        function showDifficulty(categoryName) {
+            mainTitle.textContent = "Wybierz Poziom Trudności";
+            menuContainer.innerHTML = '';
+
+            const difficulties = ['Łatwy', 'Średni', 'Trudny'];
+            difficulties.forEach(difficulty => {
+                const button = document.createElement('button');
+                button.textContent = difficulty;
+                button.onclick = () => startQuiz(categoryName, difficulty); 
+                menuContainer.appendChild(button);
+            });
+        }
+
+        function startQuiz(categoryName, difficulty) {
             currentQuizData = allQuizData[categoryName];
+            // Można dodać logikę do filtrowania pytań w zależności od poziomu trudności
             shuffleArray(currentQuizData);
             currentQuestionIndex = 0;
             score = 0;
             totalQuestions = 0;
 
-            mainTitle.textContent = categoryName;
+            mainTitle.textContent = `${categoryName} - Poziom: ${difficulty}`;
             document.getElementById('logoImage').style.display = 'none';
             menuContainer.style.display = 'none'; 
             aboutContent.style.display = 'none';
