@@ -156,6 +156,52 @@
         #quizContent { display: none; }
         #aboutContent { display: none; }
         #opinionsContent { display: none; }
+
+        /* Language selector (top-left) */
+        .lang-selector {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            font-size: 14px;
+            color: #ecf0f1;
+            user-select: none;
+        }
+        .lang-btn {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #ecf0f1;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lang-dropdown {
+            display: none;
+            margin-top: 6px;
+            background: rgba(52,73,94,0.95);
+            border-radius: 6px;
+            padding: 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+            min-width: 120px;
+            text-align: left;
+        }
+        .lang-dropdown button {
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            padding: 6px 8px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .lang-dropdown button:hover {
+            background: rgba(241,196,15,0.12);
+            color: #f1c40f;
+        }
     </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
@@ -164,11 +210,19 @@
 <body>
 
     <div class="quiz-container">
-        
+        <!-- Language selector -->
+        <div class="lang-selector" id="langSelector">
+            <div class="lang-btn" id="langBtn">PL ▾</div>
+            <div class="lang-dropdown" id="langDropdown">
+                <button onclick="setLanguage('pl')">Polski</button>
+                <button onclick="setLanguage('en')">English</button>
+            </div>
+        </div>
+
         <div class="main-nav">
-            <button onclick="showSection('menu')">START</button>
-            <button onclick="showSection('about')">O PROJEKCIE</button>
-            <button onclick="showSection('opinions')">OPINIE</button>
+            <button id="navStart" onclick="showSection('menu')">START</button>
+            <button id="navAbout" onclick="showSection('about')">O PROJEKCIE</button>
+            <button id="navOpinions" onclick="showSection('opinions')">OPINIE</button>
         </div>
 
         <h1 id="mainTitle">Wybierz Kategorię Quizu</h1>
@@ -177,48 +231,17 @@
         
         <div id="menu">
             </div>
-        
+
         <div id="aboutContent">
-            <h2>ℹ️ Informacje o Projekcie Quizu</h2>
-            <p>Witaj w naszym interaktywnym quizie opartym na rozpoznawaniu symboli! Projekt ten ma na celu połączenie edukacji z zabawą, pozwalając na szybką naukę i testowanie wiedzy o flagach, ikonach i emotikonach.</p>
-
-            <h3>🎯 Cel Projektu</h3>
-            <ul>
-                <li>Edukacja wizualna: Rozwijanie umiejętności szybkiego rozpoznawania symboli.</li>
-                <li>Rozrywka: Dostarczenie ciekawej i wciągającej formy spędzania czasu.</li>
-                <li>Demonstracja technologii: Pokazanie, jak proste strony internetowe mogą być w pełni interaktywne bez potrzeby korzystania z zewnętrznych serwerów.</li>
-            </ul>
-
-            <h3>💻 Technologie</h3>
-            <p>Quiz został zbudowany w całości w jednym pliku `quiz.html`, używając trzech podstawowych technologii webowych:</p>
-            <ul>
-                <li>HTML (HyperText Markup Language): Struktura i układ strony (np. tytuły, przyciski).</li>
-                <li>CSS (Cascading Style Sheets): Wygląd i styl (np. ciemne tło, kolor przycisków).</li>
-                <li>JavaScript (JS): Logika i interaktywność (np. mieszanie pytań, sprawdzanie odpowiedzi, liczenie punktów i przełączanie widoków).</li>
-            </ul>
-
-            <h3>🧑‍💻 Twórca</h3>
-            <p>Zrobił to mistrz programowania **Mniok Krzesiwo** z **10-letnim** doświadczeniem!</p>
+            <!-- ...existing code... (will be replaced by JS translations on language change) -->
         </div>
 
         <div id="opinionsContent">
-            <h2>💬 Opinie Użytkowników</h2>
-            
-            <div style="background-color: rgba(100, 100, 100, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <h3>Podziel się swoją opinią</h3>
-                <input type="text" id="opinionAuthor" placeholder="Twoje imię" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box;">
-                <textarea id="opinionText" placeholder="Wpisz swoją opinię o quizie..." style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box; min-height: 80px; font-family: Arial, sans-serif;"></textarea>
-                <button onclick="addOpinion()" style="width: 100%; padding: 10px; background-color: #f1c40f; color: #2c3e50; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px;">Wyślij opinię</button>
-            </div>
-
-            <div id="opinionsList" style="max-height: 400px; overflow-y: auto;">
-                <!-- Opinie będą ładowane tutaj dynamicznie -->
-            </div>
+            <!-- ...existing code... (will be replaced by JS translations on language change) -->
         </div>
 
-
         <div id="quizContent">
-            <p>Jaki symbol reprezentuje:</p>
+            <p id="questionPrompt">Jaki symbol reprezentuje:</p>
             <div id="questionText" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
             
             <div id="symbolDisplay" class="symbol-display">?</div>
@@ -363,81 +386,68 @@
 
         // --- FUNKCJA WYSWIETLA MENU ---
         function showMenu() {
-            mainTitle.textContent = "Wybierz Kategorię Quizu";
             document.getElementById('logoImage').style.display = 'block';
             menuContainer.innerHTML = '';
-            
-            // Usunięto niepotrzebne kategorie, zostaje tylko "Kraje (Flagi)"
+            mainTitle.textContent = i18n[currentLanguage].mainTitle;
+
             Object.keys(allQuizData).forEach(categoryName => {
                 const button = document.createElement('button');
-                button.textContent = categoryName;
-                button.onclick = () => showDifficulty(categoryName); 
+                button.textContent = i18n[currentLanguage].categoryMap[categoryName] || categoryName;
+                button.onclick = () => showDifficulty(categoryName);
                 menuContainer.appendChild(button);
             });
         }
 
         function showDifficulty(categoryName) {
-            mainTitle.textContent = "Wybierz Poziom Trudności";
+            mainTitle.textContent = i18n[currentLanguage].difficultyTitle;
+            lastCategory = categoryName; // save internal category key
             menuContainer.innerHTML = '';
 
-            // Dodano poziom "Bardzo trudny"
-            const difficulties = ['Łatwy', 'Średni', 'Trudny', 'Bardzo trudny'];
-            difficulties.forEach(difficulty => {
-                const button = document.createElement('button');
-                button.textContent = difficulty;
-                button.onclick = () => startQuiz(categoryName, difficulty);
-                menuContainer.appendChild(button);
+            // difficulty keys (internal) mapped to labels
+            const keys = ['easy','medium','hard','very'];
+            keys.forEach(key => {
+                const btn = document.createElement('button');
+                btn.textContent = i18n[currentLanguage].difficulties[key];
+                btn.onclick = () => startQuiz(categoryName, key);
+                menuContainer.appendChild(btn);
             });
         }
 
-        function startQuiz(categoryName, difficulty) {
-            // zachowujemy referencję ostatniej konfiguracji (do ewentualnego powtórzenia)
+        function startQuiz(categoryName, difficultyKey) {
             lastCategory = categoryName;
-            lastDifficulty = difficulty;
-
-            // Wybór puli pytań zależnie od kategorii i poziomu trudności
+            lastDifficulty = difficultyKey; // save internal key
+            // Wybór puli pytań zależnie od kategorii i poziomu trudności (używamy kluczy)
             if (categoryName === "Kraje (Flagi)") {
-                if (difficulty === 'Bardzo trudny') {
-                    // tylko wyspy (type: "island") z rozszerzonej listy
+                if (difficultyKey === 'very') {
                     currentPool = allFlagsExtended.filter(item => item.type === "island");
-                } else if (difficulty === 'Trudny') {
-                    // duża pula (cały świat, ale bez dodatkowych wysp z rozszerzonej listy)
+                } else if (difficultyKey === 'hard') {
                     currentPool = allFlags.slice();
-                } else if (difficulty === 'Średni') {
+                } else if (difficultyKey === 'medium') {
                     currentPool = allFlags.filter(f => f.region === 'Europe');
                 } else {
                     currentPool = allQuizData["Kraje (Flagi)"].slice();
                 }
                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
-            } else {
-                // Usunięto obsługę innych kategorii
-                // (niepotrzebne, bo nie ma innych kategorii)
             }
             shuffleArray(currentQuizData);
             currentQuestionIndex = 0;
             score = 0;
-
-            // Ustawiamy ile pytań będzie w tej sesji (max 10)
             totalQuestions = Math.min(10, currentQuizData.length);
             answeredCount = 0;
             incorrectAnswers = [];
 
-            mainTitle.textContent = `${categoryName} - Poziom: ${difficulty}`;
+            mainTitle.textContent = `${i18n[currentLanguage].categoryMap[categoryName] || categoryName} - Poziom: ${i18n[currentLanguage].difficulties[difficultyKey]}`;
             document.getElementById('logoImage').style.display = 'none';
-            menuContainer.style.display = 'none'; 
+            menuContainer.style.display = 'none';
             aboutContent.style.display = 'none';
             quizContent.style.display = 'block';
-            
             loadQuestion();
         }
 
         function loadQuestion() {
-            // Jeżeli osiągnięto zaplanowaną liczbę pytań -> pokaż podsumowanie
             if (currentQuestionIndex >= totalQuestions) {
-                // Podsumowanie wyników: tabela z odpowiedziami (wszystkie)
-                questionTextElement.textContent = "Koniec Quizu!";
+                questionTextElement.textContent = i18n[currentLanguage].mainTitle; // or "Koniec Quizu!"
                 symbolDisplayElement.textContent = "🎉";
-
                 let wrongCount = totalQuestions - score;
                 let summaryHtml = `<div style="text-align:left;">
                     <p>Twoje wyniki: <strong>${score}</strong> poprawnych, <strong>${wrongCount}</strong> błędnych (z ${totalQuestions}).</p>`;
@@ -488,8 +498,8 @@
                 summaryHtml += `</tbody></table>`;
 
                 summaryHtml += `<div style="margin-top:12px;">
-                    <button onclick="showSection('menu')" style="margin-right:8px;">Wróć do Menu</button>
-                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">Spróbuj ponownie tę samą kategorię</button>
+                    <button onclick="showSection('menu')" style="margin-right:8px;">${i18n[currentLanguage].summaryBackToMenu}</button>
+                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">${i18n[currentLanguage].summaryTryAgain}</button>
                 </div>
                 </div>`;
 
@@ -501,18 +511,16 @@
 
             const currentQuestion = currentQuizData[currentQuestionIndex];
             questionTextElement.textContent = currentQuestion.name;
-            symbolDisplayElement.textContent = "?"; 
+            symbolDisplayElement.textContent = "?";
             optionsContainer.innerHTML = '';
             feedbackElement.textContent = '';
-            
-            // Zbieramy odpowiedzi z currentPool (dostosowanej puli)
+
             let options = [currentQuestion.symbol];
             let incorrectSymbols = [];
             const questionType = currentQuestion.type;
-            
+
             currentPool.forEach(item => {
                 if (item.symbol && item.symbol !== currentQuestion.symbol) {
-                    // Filtrujemy odpowiedzi po typie (kraju vs wyspy)
                     if (!questionType || item.type === questionType) {
                         incorrectSymbols.push(item.symbol);
                     }
@@ -520,17 +528,15 @@
             });
             shuffleArray(incorrectSymbols);
             options = options.concat(incorrectSymbols.slice(0, Math.min(3, incorrectSymbols.length)));
-            shuffleArray(options); 
+            shuffleArray(options);
 
             options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
-                // Przekazujemy też nazwę pytania, aby móc zapisać błędy
                 button.onclick = () => checkAnswer(button, option, currentQuestion.symbol, currentQuestion.name);
                 optionsContainer.appendChild(button);
             });
 
-            // Zamiast wyniku, pokazujemy numer pytania
             scoreElement.textContent = `Ilość: ${currentQuestionIndex + 1} / ${totalQuestions}`;
         }
         
@@ -538,24 +544,22 @@
             Array.from(optionsContainer.children).forEach(button => {
                 button.disabled = true;
             });
-            
-            symbolDisplayElement.textContent = correctAnswerSymbol; 
+            symbolDisplayElement.textContent = correctAnswerSymbol;
 
             if (selectedSymbol === correctAnswerSymbol) {
-                feedbackElement.textContent = "✅ Dobrze!";
+                feedbackElement.textContent = i18n[currentLanguage].feedback.correct;
                 feedbackElement.className = "feedback correct";
-                clickedButton.style.backgroundColor = "#2ecc71"; 
+                clickedButton.style.backgroundColor = "#2ecc71";
                 score++;
             } else {
-                feedbackElement.textContent = "❌ Źle! Poprawny to " + correctAnswerSymbol;
+                feedbackElement.textContent = i18n[currentLanguage].feedback.incorrectPrefix + correctAnswerSymbol;
                 feedbackElement.className = "feedback incorrect";
-                clickedButton.style.backgroundColor = "#e74c3c"; 
+                clickedButton.style.backgroundColor = "#e74c3c";
                 Array.from(optionsContainer.children).forEach(button => {
                     if (button.textContent === correctAnswerSymbol) {
                         button.style.backgroundColor = "#2ecc71";
                     }
                 });
-                // Zapisujemy błąd wraz z nazwą pytania i odpowiedziami
                 incorrectAnswers.push({
                     name: questionName,
                     selected: selectedSymbol,
@@ -564,7 +568,6 @@
             }
 
             answeredCount++;
-            // Zamiast wyniku, pokazujemy numer pytania (jeśli nie koniec)
             if (currentQuestionIndex + 1 < totalQuestions) {
                 scoreElement.textContent = `Ilość: ${currentQuestionIndex + 2} / ${totalQuestions}`;
             }
@@ -588,7 +591,7 @@
             }
 
             // Ładowanie z Firebase
-            opinionsList.innerHTML = '<p style="text-align: center; color: #bdc3c7;">Ładowanie opinii...</p>';
+            opinionsList.innerHTML = `<p style="text-align: center; color: #bdc3c7;">${i18n[currentLanguage].loadingOpinions}</p>`;
             
             const opinionsRef = firebase.database().ref('opinions');
             opinionsRef.orderByChild('timestamp').limitToLast(50).once('value', (snapshot) => {
@@ -597,16 +600,15 @@
                 displayOpinions(opinions.reverse(), opinionsList);
             }).catch(error => {
                 console.error("Firebase error:", error);
-                opinionsList.innerHTML = '<p style="text-align: center; color: #e74c3c;">Błąd ładowania opinii</p>';
+                opinionsList.innerHTML = `<p style="text-align: center; color: #e74c3c;">Błąd ładowania opinii</p>`;
             });
         }
 
         function displayOpinions(opinions, opinionsList) {
             if (opinions.length === 0) {
-                opinionsList.innerHTML = '<p style="text-align: center; color: #bdc3c7;">Brak opinii. Bądź pierwszy!</p>';
+                opinionsList.innerHTML = `<p style="text-align: center; color: #bdc3c7;">${i18n[currentLanguage].noOpinions}</p>`;
                 return;
             }
-
             opinionsList.innerHTML = '';
             opinions.forEach((opinion) => {
                 const opinionDiv = document.createElement('div');
@@ -626,31 +628,31 @@
             const text = document.getElementById('opinionText').value.trim();
 
             if (text === '') {
-                alert('Proszę wpisać opinię!');
+                alert(i18n[currentLanguage].alertEmptyOpinion);
                 return;
             }
 
             const now = new Date();
-            const dateStr = now.toLocaleDateString('pl-PL') + ' ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = now.toLocaleDateString((currentLanguage==='pl')?'pl-PL':'en-GB') + ' ' + now.toLocaleTimeString((currentLanguage==='pl')?'pl-PL':'en-GB', { hour: '2-digit', minute: '2-digit' });
 
             if (!db) {
                 // Fallback na localStorage
                 const opinions = JSON.parse(localStorage.getItem('quizOpinions')) || [];
                 opinions.push({
-                    author: author || 'Anonimowy',
+                    author: author || (currentLanguage==='pl' ? 'Anonimowy' : 'Anonymous'),
                     text: text,
                     date: dateStr
                 });
                 localStorage.setItem('quizOpinions', JSON.stringify(opinions));
                 loadOpinions();
-                alert('Dziękujemy za opinię!');
+                alert(i18n[currentLanguage].alertThankYou);
                 return;
             }
 
             // Zapis do Firebase
             const opinionsRef = firebase.database().ref('opinions').push();
             opinionsRef.set({
-                author: author || 'Anonimowy',
+                author: author || (currentLanguage==='pl' ? 'Anonimowy' : 'Anonymous'),
                 text: text,
                 date: dateStr,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -658,15 +660,75 @@
                 document.getElementById('opinionAuthor').value = '';
                 document.getElementById('opinionText').value = '';
                 loadOpinions();
-                alert('Dziękujemy za opinię!');
+                alert(i18n[currentLanguage].alertThankYou);
             }).catch(error => {
                 console.error("Error:", error);
-                alert('Błąd przy wysyłaniu opinii. Spróbuj jeszcze raz.');
+                alert(i18n[currentLanguage].alertOpinionError);
             });
         }
 
-        // Uruchomienie menu przy ładowaniu strony
-        window.onload = () => showSection('menu');
+        // Toggle dropdown
+        document.getElementById('langBtn').addEventListener('click', () => {
+            const dd = document.getElementById('langDropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        });
+        // Close dropdown on outside click
+        window.addEventListener('click', (e) => {
+            const ls = document.getElementById('langSelector');
+            if (!ls.contains(e.target)) {
+                document.getElementById('langDropdown').style.display = 'none';
+            }
+        });
+
+        let currentLanguage = 'pl';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const t = i18n[lang];
+
+            // Update nav buttons
+            document.getElementById('navStart').textContent = t.nav.start;
+            document.getElementById('navAbout').textContent = t.nav.about;
+            document.getElementById('navOpinions').textContent = t.nav.opinions;
+            document.getElementById('langBtn').textContent = (lang === 'pl') ? 'PL ▾' : 'EN ▾';
+
+            // Update mainTitle if on menu, otherwise keep context-aware changes
+            if (document.getElementById('menu').style.display !== 'none') {
+                document.getElementById('mainTitle').textContent = t.mainTitle;
+            }
+
+            // Update static content: about & opinions (rebuild so IDs remain)
+            document.getElementById('aboutContent').innerHTML = t.aboutHTML;
+
+            // opinionsContent: build form + opinionsList container
+            document.getElementById('opinionsContent').innerHTML = `
+                <h2>${t.opinionsForm.header}</h2>
+                <div style="background-color: rgba(100, 100, 100, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3>${t.opinionsForm.shareHeading}</h3>
+                    <input type="text" id="opinionAuthor" placeholder="${t.opinionsForm.authorPlaceholder}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box;">
+                    <textarea id="opinionText" placeholder="${t.opinionsForm.textPlaceholder}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box; min-height: 80px; font-family: Arial, sans-serif;"></textarea>
+                    <button onclick="addOpinion()" style="width: 100%; padding: 10px; background-color: #f1c40f; color: #2c3e50; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px;">${t.opinionsForm.sendButton}</button>
+                </div>
+                <div id="opinionsList" style="max-height: 400px; overflow-y: auto;"></div>
+            `;
+
+            // Update question prompt
+            const qp = document.getElementById('questionPrompt');
+            if (qp) qp.textContent = t.questionPrompt;
+
+            // If currently showing difficulty menu, regenerate it in selected language
+            if (document.getElementById('menu').style.display !== 'none' && mainTitle.textContent === i18n[lang].difficultyTitle) {
+                // Recreate difficulty view for current category if available
+                // store current category from lastCategory if set
+                if (lastCategory) showDifficulty(lastCategory);
+            }
+        }
+
+        // Uruchomienie menu przy ładowaniu strony i ustawienie domyślnego języka
+        window.onload = () => {
+            showSection('menu');
+            setLanguage('pl');
+        };
     </script>
 
 </body>
