@@ -149,6 +149,9 @@
         #aboutContent { display: none; }
         #opinionsContent { display: none; }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
 </head>
 <body>
 
@@ -222,8 +225,26 @@
     </div>
 
     <script>
-        // JavaScript: Logika zarządzania sekcjami i quizem
-        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnZ_your_api_key_here",
+            authDomain: "quiz-opinions.firebaseapp.com",
+            databaseURL: "https://quiz-opinions-default-rtdb.europe-west1.firebaseio.com",
+            projectId: "quiz-opinions",
+            storageBucket: "quiz-opinions.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123def456"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) {
+            console.warn("Firebase not available, using localStorage fallback");
+        }
+
         // --- BAZA PYTAŃ ---
         // Zachowujemy mały zestaw dla poziomu "Łatwy"
         const allQuizData = {
@@ -546,25 +567,47 @@
             }, 1200);
         }
 
-        // --- OPINIE ---
+        // --- OPINIE (ZAKTUALIZOWANE NA FIREBASE) ---
 
         function loadOpinions() {
             const opinionsList = document.getElementById('opinionsList');
-            const opinions = JSON.parse(localStorage.getItem('quizOpinions')) || [];
             
+            if (!db) {
+                // Fallback na localStorage
+                const opinions = JSON.parse(localStorage.getItem('quizOpinions')) || [];
+                displayOpinions(opinions, opinionsList);
+                return;
+            }
+
+            // Ładowanie z Firebase
+            opinionsList.innerHTML = '<p style="text-align: center; color: #bdc3c7;">Ładowanie opinii...</p>';
+            
+            const opinionsRef = firebase.database().ref('opinions');
+            opinionsRef.orderByChild('timestamp').limitToLast(50).once('value', (snapshot) => {
+                const data = snapshot.val();
+                const opinions = data ? Object.values(data) : [];
+                displayOpinions(opinions.reverse(), opinionsList);
+            }).catch(error => {
+                console.error("Firebase error:", error);
+                opinionsList.innerHTML = '<p style="text-align: center; color: #e74c3c;">Błąd ładowania opinii</p>';
+            });
+        }
+
+        function displayOpinions(opinions, opinionsList) {
             if (opinions.length === 0) {
                 opinionsList.innerHTML = '<p style="text-align: center; color: #bdc3c7;">Brak opinii. Bądź pierwszy!</p>';
                 return;
             }
 
             opinionsList.innerHTML = '';
-            opinions.reverse().forEach((opinion, index) => {
+            opinions.forEach((opinion) => {
                 const opinionDiv = document.createElement('div');
                 opinionDiv.style.cssText = 'background-color: rgba(100, 100, 100, 0.2); padding: 12px; margin: 10px 0; border-radius: 6px; border-left: 3px solid #f1c40f;';
+                const dateStr = opinion.date || 'Niedawno';
                 opinionDiv.innerHTML = `
                     <p style="margin: 0 0 5px 0; font-weight: bold; color: #f1c40f;">${opinion.author || 'Anonimowy'}</p>
                     <p style="margin: 0; color: #ecf0f1;">${opinion.text}</p>
-                    <small style="color: #bdc3c7;">${opinion.date}</small>
+                    <small style="color: #bdc3c7;">${dateStr}</small>
                 `;
                 opinionsList.appendChild(opinionDiv);
             });
@@ -579,23 +622,39 @@
                 return;
             }
 
-            const opinions = JSON.parse(localStorage.getItem('quizOpinions')) || [];
             const now = new Date();
             const dateStr = now.toLocaleDateString('pl-PL') + ' ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
 
-            opinions.push({
+            if (!db) {
+                // Fallback na localStorage
+                const opinions = JSON.parse(localStorage.getItem('quizOpinions')) || [];
+                opinions.push({
+                    author: author || 'Anonimowy',
+                    text: text,
+                    date: dateStr
+                });
+                localStorage.setItem('quizOpinions', JSON.stringify(opinions));
+                loadOpinions();
+                alert('Dziękujemy za opinię!');
+                return;
+            }
+
+            // Zapis do Firebase
+            const opinionsRef = firebase.database().ref('opinions').push();
+            opinionsRef.set({
                 author: author || 'Anonimowy',
                 text: text,
-                date: dateStr
+                date: dateStr,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                document.getElementById('opinionAuthor').value = '';
+                document.getElementById('opinionText').value = '';
+                loadOpinions();
+                alert('Dziękujemy za opinię!');
+            }).catch(error => {
+                console.error("Error:", error);
+                alert('Błąd przy wysyłaniu opinii. Spróbuj jeszcze raz.');
             });
-
-            localStorage.setItem('quizOpinions', JSON.stringify(opinions));
-            
-            document.getElementById('opinionAuthor').value = '';
-            document.getElementById('opinionText').value = '';
-            
-            loadOpinions();
-            alert('Dziękujemy za opinię!');
         }
 
         // Uruchomienie menu przy ładowaniu strony
