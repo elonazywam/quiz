@@ -206,6 +206,7 @@
         // JavaScript: Logika zarządzania sekcjami i quizem
         
         // --- BAZA PYTAŃ ---
+        // Zachowujemy mały zestaw dla poziomu "Łatwy"
         const allQuizData = {
             "Kraje (Flagi)": [
                 { name: "Polska", symbol: "🇵🇱" },
@@ -229,9 +230,37 @@
                 { name: "Wino", symbol: "🍷" },
             ]
         };
+        // Dodatkowa pełna pula flag z oznaczeniem regionu (używana dla Średni/Trudny)
+        const allFlags = [
+            { name: "Polska", symbol: "🇵🇱", region: "Europe" },
+            { name: "Niemcy", symbol: "🇩🇪", region: "Europe" },
+            { name: "Włochy", symbol: "🇮🇹", region: "Europe" },
+            { name: "Hiszpania", symbol: "🇪🇸", region: "Europe" },
+            { name: "Francja", symbol: "🇫🇷", region: "Europe" },
+            { name: "Wielka Brytania", symbol: "🇬🇧", region: "Europe" },
+            { name: "Szwecja", symbol: "🇸🇪", region: "Europe" },
+            { name: "Norwegia", symbol: "🇳🇴", region: "Europe" },
+            { name: "Holandia", symbol: "🇳🇱", region: "Europe" },
+            { name: "Portugalia", symbol: "🇵🇹", region: "Europe" },
+            { name: "Stany Zjednoczone", symbol: "🇺🇸", region: "Americas" },
+            { name: "Kanada", symbol: "🇨🇦", region: "Americas" },
+            { name: "Brazylia", symbol: "🇧🇷", region: "Americas" },
+            { name: "Meksyk", symbol: "🇲🇽", region: "Americas" },
+            { name: "Argentyna", symbol: "🇦🇷", region: "Americas" },
+            { name: "Japonia", symbol: "🇯🇵", region: "Asia" },
+            { name: "Chiny", symbol: "🇨🇳", region: "Asia" },
+            { name: "Indie", symbol: "🇮🇳", region: "Asia" },
+            { name: "Australia", symbol: "🇦🇺", region: "Oceania" },
+            { name: "Nowa Zelandia", symbol: "🇳🇿", region: "Oceania" },
+            { name: "RPA", symbol: "🇿🇦", region: "Africa" },
+            { name: "Egipt", symbol: "🇪🇬", region: "Africa" },
+            // ...możesz dopisać więcej pozycji jeśli chcesz...
+        ];
         // ------------------
 
         let currentQuizData = []; 
+        // currentPool to zbiór, z którego losujemy błędne odpowiedzi (dostosowany do poziomu)
+        let currentPool = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let totalQuestions = 0;
@@ -294,14 +323,28 @@
             difficulties.forEach(difficulty => {
                 const button = document.createElement('button');
                 button.textContent = difficulty;
-                button.onclick = () => startQuiz(categoryName, difficulty); 
+                button.onclick = () => startQuiz(categoryName, difficulty);
                 menuContainer.appendChild(button);
             });
         }
 
         function startQuiz(categoryName, difficulty) {
-            currentQuizData = allQuizData[categoryName];
-            // Można dodać logikę do filtrowania pytań w zależności od poziomu trudności
+            // Wybór puli pytań zależnie od kategorii i poziomu trudności
+            if (categoryName === "Kraje (Flagi)") {
+                if (difficulty === 'Trudny') {
+                    currentPool = allFlags.slice(); // cały świat
+                } else if (difficulty === 'Średni') {
+                    currentPool = allFlags.filter(f => f.region === 'Europe');
+                } else {
+                    // Łatwy: zachowujemy oryginalny, mały zestaw z allQuizData
+                    currentPool = allQuizData["Kraje (Flagi)"].slice();
+                }
+                // currentQuizData to lista pytań (obiekty z name/symbol)
+                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol }));
+            } else {
+                currentQuizData = allQuizData[categoryName].slice();
+                currentPool = currentQuizData.slice();
+            }
             shuffleArray(currentQuizData);
             currentQuestionIndex = 0;
             score = 0;
@@ -334,22 +377,19 @@
             optionsContainer.innerHTML = '';
             feedbackElement.textContent = '';
             
+            // Zbieramy odpowiedzi z currentPool (dostosowanej puli)
             let options = [currentQuestion.symbol];
-            
             let incorrectSymbols = [];
-            // Losowanie fałszywych odpowiedzi ze WSZYSTKICH pytań, oprócz bieżącego
-            Object.values(allQuizData).forEach(dataArray => {
-                dataArray.forEach(item => {
-                    if (item.symbol !== currentQuestion.symbol) {
-                        incorrectSymbols.push(item.symbol);
-                    }
-                });
+            currentPool.forEach(item => {
+                if (item.symbol && item.symbol !== currentQuestion.symbol) {
+                    incorrectSymbols.push(item.symbol);
+                }
             });
-            
             shuffleArray(incorrectSymbols);
-            options = options.concat(incorrectSymbols.slice(0, 3));
-            
-            shuffleArray(options); 
+            // weź maksymalnie 3 fałszywe odpowiedzi (jeśli jest mniej - weź tyle ile jest)
+            options = options.concat(incorrectSymbols.slice(0, Math.min(3, incorrectSymbols.length)));
+             
+             shuffleArray(options); 
 
             options.forEach(option => {
                 const button = document.createElement('button');
