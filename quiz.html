@@ -275,6 +275,24 @@
             { name: "Egipt", symbol: "🇪🇬", region: "Africa" },
             // ...możesz dopisać więcej pozycji jeśli chcesz...
         ];
+        // Rozszerzona pula flag: zawiera bardziej egzotyczne/islandowe państwa (używana dla "Bardzo trudny")
+        const allFlagsExtended = allFlags.concat([
+            { name: "Islandia", symbol: "🇮🇸", region: "Europe" },
+            { name: "Islandy (Faroe)", symbol: "🇫🇴", region: "Europe" },
+            { name: "Malediwy", symbol: "🇲🇻", region: "Asia" },
+            { name: "Fidżi", symbol: "🇫🇯", region: "Oceania" },
+            { name: "Bahamy", symbol: "🇧🇸", region: "Americas" },
+            { name: "Bermudy", symbol: "🇧🇲", region: "Americas" },
+            { name: "Seszele", symbol: "🇸🇨", region: "Africa" },
+            { name: "Mauritius", symbol: "🇲🇺", region: "Africa" },
+            { name: "Kiribati", symbol: "🇰🇮", region: "Oceania" },
+            { name: "Nauru", symbol: "🇳🇷", region: "Oceania" },
+            { name: "Palau", symbol: "🇵🇼", region: "Oceania" },
+            { name: "Wyspy Marshalla", symbol: "🇲🇭", region: "Oceania" },
+            { name: "Saint Kitts i Nevis", symbol: "🇰🇳", region: "Americas" },
+            { name: "Antigua i Barbuda", symbol: "🇦🇬", region: "Americas" },
+            // ...możesz dopisać więcej państewek/wysp według potrzeby...
+        ]);
         // ------------------
 
         let currentQuizData = []; 
@@ -348,7 +366,8 @@
             mainTitle.textContent = "Wybierz Poziom Trudności";
             menuContainer.innerHTML = '';
 
-            const difficulties = ['Łatwy', 'Średni', 'Trudny'];
+            // Dodano poziom "Bardzo trudny"
+            const difficulties = ['Łatwy', 'Średni', 'Trudny', 'Bardzo trudny'];
             difficulties.forEach(difficulty => {
                 const button = document.createElement('button');
                 button.textContent = difficulty;
@@ -361,11 +380,15 @@
             // zachowujemy referencję ostatniej konfiguracji (do ewentualnego powtórzenia)
             lastCategory = categoryName;
             lastDifficulty = difficulty;
-
+ 
             // Wybór puli pytań zależnie od kategorii i poziomu trudności
             if (categoryName === "Kraje (Flagi)") {
-                if (difficulty === 'Trudny') {
-                    currentPool = allFlags.slice(); // cały świat
+                if (difficulty === 'Bardzo trudny') {
+                    // pełna, rozszerzona baza zawierająca wyspy i małe państewka
+                    currentPool = allFlagsExtended.slice();
+                } else if (difficulty === 'Trudny') {
+                    // duża pula (cały świat, ale bez dodatkowych wysp z rozszerzonej listy)
+                    currentPool = allFlags.slice();
                 } else if (difficulty === 'Średni') {
                     currentPool = allFlags.filter(f => f.region === 'Europe');
                 } else {
