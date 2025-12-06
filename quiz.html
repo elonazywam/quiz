@@ -259,11 +259,16 @@
         // ------------------
 
         let currentQuizData = []; 
-        // currentPool to zbiór, z którego losujemy błędne odpowiedzi (dostosowany do poziomu)
         let currentPool = [];
         let currentQuestionIndex = 0;
         let score = 0;
-        let totalQuestions = 0;
+        // ZAMIANA: zamiast dynamicznie inkrementować totalQuestions przy każdym pytaniu,
+        // ustawiamy docelową liczbę pytań przy starcie quizu (max 10).
+        let totalQuestions = 0;      // docelowa liczba pytań w tej sesji (np. 10)
+        let answeredCount = 0;      // ile pytań już odpowiedziano (używane do progresu)
+        let incorrectAnswers = [];  // zbieramy obiekty { name, selected, correct }
+        let lastCategory = null;
+        let lastDifficulty = null;
 
         // Elementy DOM
         const menuContainer = document.getElementById('menu');
@@ -329,6 +334,10 @@
         }
 
         function startQuiz(categoryName, difficulty) {
+            // zachowujemy referencję ostatniej konfiguracji (do ewentualnego powtórzenia)
+            lastCategory = categoryName;
+            lastDifficulty = difficulty;
+
             // Wybór puli pytań zależnie od kategorii i poziomu trudności
             if (categoryName === "Kraje (Flagi)") {
                 if (difficulty === 'Trudny') {
@@ -336,10 +345,8 @@
                 } else if (difficulty === 'Średni') {
                     currentPool = allFlags.filter(f => f.region === 'Europe');
                 } else {
-                    // Łatwy: zachowujemy oryginalny, mały zestaw z allQuizData
                     currentPool = allQuizData["Kraje (Flagi)"].slice();
                 }
-                // currentQuizData to lista pytań (obiekty z name/symbol)
                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol }));
             } else {
                 currentQuizData = allQuizData[categoryName].slice();
@@ -348,7 +355,11 @@
             shuffleArray(currentQuizData);
             currentQuestionIndex = 0;
             score = 0;
-            totalQuestions = 0;
+
+            // Ustawiamy ile pytań będzie w tej sesji (max 10)
+            totalQuestions = Math.min(10, currentQuizData.length);
+            answeredCount = 0;
+            incorrectAnswers = [];
 
             mainTitle.textContent = `${categoryName} - Poziom: ${difficulty}`;
             document.getElementById('logoImage').style.display = 'none';
@@ -360,16 +371,50 @@
         }
 
         function loadQuestion() {
-            if (currentQuestionIndex >= currentQuizData.length) {
-                // Koniec quizu
+            // Jeżeli osiągnięto zaplanowaną liczbę pytań -> pokaż podsumowanie
+            if (currentQuestionIndex >= totalQuestions) {
+                // Podsumowanie wyników: tabela z błędami
                 questionTextElement.textContent = "Koniec Quizu!";
                 symbolDisplayElement.textContent = "🎉";
-                optionsContainer.innerHTML = '<p>Twój końcowy wynik to: ' + score + ' / ' + currentQuizData.length + '</p><button onclick="showSection(\'menu\')">Wróć do Menu</button>';
+                
+                let wrongCount = totalQuestions - score;
+                let summaryHtml = `<div style="text-align:left;">
+                    <p>Twoje wyniki: <strong>${score}</strong> poprawnych, <strong>${wrongCount}</strong> błędnych (z ${totalQuestions}).</p>`;
+
+                if (incorrectAnswers.length > 0) {
+                    summaryHtml += `<table style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Pytanie</th>
+                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Twoja odpowiedź</th>
+                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Poprawna odpowiedź</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    incorrectAnswers.forEach(item => {
+                        summaryHtml += `<tr>
+                            <td style="padding:6px; border-top:1px solid #eee;">${item.name}</td>
+                            <td style="padding:6px; border-top:1px solid #eee;">${item.selected}</td>
+                            <td style="padding:6px; border-top:1px solid #eee;">${item.correct}</td>
+                        </tr>`;
+                    });
+                    summaryHtml += `</tbody></table>`;
+                } else {
+                    summaryHtml += `<p>Gratulacje! Wszystkie odpowiedzi poprawne 🎉</p>`;
+                }
+
+                // Opcje po zakończeniu: powrót do menu lub spróbuj ponownie ten sam quiz
+                summaryHtml += `<div style="margin-top:12px;">
+                    <button onclick="showSection('menu')" style="margin-right:8px;">Wróć do Menu</button>
+                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">Spróbuj ponownie tę samą kategorię</button>
+                </div>
+                </div>`;
+
+                optionsContainer.innerHTML = summaryHtml;
                 feedbackElement.textContent = "";
+                scoreElement.textContent = `Wynik: ${score} / ${totalQuestions}`;
                 return;
             }
-
-            totalQuestions++;
 
             const currentQuestion = currentQuizData[currentQuestionIndex];
             questionTextElement.textContent = currentQuestion.name;
@@ -386,20 +431,19 @@
                 }
             });
             shuffleArray(incorrectSymbols);
-            // weź maksymalnie 3 fałszywe odpowiedzi (jeśli jest mniej - weź tyle ile jest)
             options = options.concat(incorrectSymbols.slice(0, Math.min(3, incorrectSymbols.length)));
-             
-             shuffleArray(options); 
+            shuffleArray(options); 
 
             options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
-                button.onclick = () => checkAnswer(button, option, currentQuestion.symbol);
+                // Przekazujemy też nazwę pytania, aby móc zapisać błędy
+                button.onclick = () => checkAnswer(button, option, currentQuestion.symbol, currentQuestion.name);
                 optionsContainer.appendChild(button);
             });
         }
         
-        function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol) {
+        function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol, questionName) {
             Array.from(optionsContainer.children).forEach(button => {
                 button.disabled = true;
             });
@@ -420,14 +464,22 @@
                         button.style.backgroundColor = "#2ecc71";
                     }
                 });
+                // Zapisujemy błąd wraz z nazwą pytania i odpowiedziami
+                incorrectAnswers.push({
+                    name: questionName,
+                    selected: selectedSymbol,
+                    correct: correctAnswerSymbol
+                });
             }
 
+            answeredCount++;
+            // Pokaż postęp: ile poprawnych na ile docelowych
             scoreElement.textContent = `Wynik: ${score} / ${totalQuestions}`;
 
             setTimeout(() => {
                 currentQuestionIndex++;
                 loadQuestion();
-            }, 2000);
+            }, 1200);
         }
 
         // Uruchomienie menu przy ładowaniu strony
