@@ -680,6 +680,86 @@
             }
         });
 
+        // Dodajemy obiekt tłumaczeń
+        const i18n = {
+            pl: {
+                nav: { start: "START", about: "O PROJEKCIE", opinions: "OPINIE" },
+                mainTitle: "Wybierz Kategorię Quizu",
+                difficultyTitle: "Wybierz poziom trudności",
+                categoryMap: {
+                    "Kraje (Flagi)": "Kraje (Flagi)"
+                },
+                difficulties: {
+                    easy: "Łatwy",
+                    medium: "Średni",
+                    hard: "Trudny",
+                    very: "Bardzo trudny"
+                },
+                questionPrompt: "Jaki symbol reprezentuje:",
+                feedback: {
+                    correct: "Poprawna odpowiedź!",
+                    incorrectPrefix: "Błędnie. Poprawny symbol: "
+                },
+                summaryBackToMenu: "Powrót do menu",
+                summaryTryAgain: "Zagraj ponownie",
+                loadingOpinions: "Ładowanie opinii...",
+                noOpinions: "Brak opinii. Bądź pierwszy!",
+                alertEmptyOpinion: "Proszę napisać swoją opinię przed wysłaniem.",
+                alertThankYou: "Dziękujemy za opinię!",
+                alertOpinionError: "Wystąpił błąd podczas zapisywania opinii.",
+                aboutHTML: `
+                    <h2>O projekcie</h2>
+                    <p>Prosty quiz edukacyjny uczący rozpoznawania flag krajów. Aplikacja obsługuje wiele poziomów trudności i zapis opinii użytkowników.</p>
+                    <p>Wersja językowa dostępna w polskim i angielskim.</p>
+                `,
+                opinionsForm: {
+                    header: "Opinie użytkowników",
+                    shareHeading: "Podziel się swoją opinią",
+                    authorPlaceholder: "Twoje imię (opcjonalnie)",
+                    textPlaceholder: "Napisz opinię...",
+                    sendButton: "Wyślij opinię"
+                }
+            },
+            en: {
+                nav: { start: "START", about: "ABOUT", opinions: "OPINIONS" },
+                mainTitle: "Choose Quiz Category",
+                difficultyTitle: "Choose difficulty level",
+                categoryMap: {
+                    "Kraje (Flagi)": "Countries (Flags)"
+                },
+                difficulties: {
+                    easy: "Easy",
+                    medium: "Medium",
+                    hard: "Hard",
+                    very: "Very Hard"
+                },
+                questionPrompt: "Which symbol represents:",
+                feedback: {
+                    correct: "Correct answer!",
+                    incorrectPrefix: "Incorrect. Correct symbol: "
+                },
+                summaryBackToMenu: "Back to menu",
+                summaryTryAgain: "Try again",
+                loadingOpinions: "Loading opinions...",
+                noOpinions: "No opinions yet. Be the first!",
+                alertEmptyOpinion: "Please write your opinion before sending.",
+                alertThankYou: "Thanks for your opinion!",
+                alertOpinionError: "Error while saving your opinion.",
+                aboutHTML: `
+                    <h2>About this project</h2>
+                    <p>A simple educational quiz for recognizing country flags. Supports multiple difficulty levels and user opinions.</p>
+                    <p>Language versions available: Polish and English.</p>
+                `,
+                opinionsForm: {
+                    header: "User opinions",
+                    shareHeading: "Share your opinion",
+                    authorPlaceholder: "Your name (optional)",
+                    textPlaceholder: "Write your opinion...",
+                    sendButton: "Send opinion"
+                }
+            }
+        };
+
         let currentLanguage = 'pl';
 
         function setLanguage(lang) {
