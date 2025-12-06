@@ -233,65 +233,49 @@
                 { name: "Włochy", symbol: "🇮🇹" },
                 { name: "Hiszpania", symbol: "🇪🇸" },
                 { name: "Francja", symbol: "🇫🇷" },
-            ],
-            "Zwierzęta (Emoji)": [
-                { name: "Pies", symbol: "🐶" },
-                { name: "Kot", symbol: "🐱" },
-                { name: "Lew", symbol: "🦁" },
-                { name: "Żółw", symbol: "🐢" },
-                { name: "Pszczoła", symbol: "🐝" },
-            ],
-            "Jedzenie i Picie": [
-                { name: "Pizza", symbol: "🍕" },
-                { name: "Kawa", symbol: "☕" },
-                { name: "Hamburger", symbol: "🍔" },
-                { name: "Lody", symbol: "🍦" },
-                { name: "Wino", symbol: "🍷" },
             ]
+            // Usunięto: "Zwierzęta (Emoji)" i "Jedzenie i Picie"
         };
         // Dodatkowa pełna pula flag z oznaczeniem regionu (używana dla Średni/Trudny)
         const allFlags = [
-            { name: "Polska", symbol: "🇵🇱", region: "Europe" },
-            { name: "Niemcy", symbol: "🇩🇪", region: "Europe" },
-            { name: "Włochy", symbol: "🇮🇹", region: "Europe" },
-            { name: "Hiszpania", symbol: "🇪🇸", region: "Europe" },
-            { name: "Francja", symbol: "🇫🇷", region: "Europe" },
-            { name: "Wielka Brytania", symbol: "🇬🇧", region: "Europe" },
-            { name: "Szwecja", symbol: "🇸🇪", region: "Europe" },
-            { name: "Norwegia", symbol: "🇳🇴", region: "Europe" },
-            { name: "Holandia", symbol: "🇳🇱", region: "Europe" },
-            { name: "Portugalia", symbol: "🇵🇹", region: "Europe" },
-            { name: "Stany Zjednoczone", symbol: "🇺🇸", region: "Americas" },
-            { name: "Kanada", symbol: "🇨🇦", region: "Americas" },
-            { name: "Brazylia", symbol: "🇧🇷", region: "Americas" },
-            { name: "Meksyk", symbol: "🇲🇽", region: "Americas" },
-            { name: "Argentyna", symbol: "🇦🇷", region: "Americas" },
-            { name: "Japonia", symbol: "🇯🇵", region: "Asia" },
-            { name: "Chiny", symbol: "🇨🇳", region: "Asia" },
-            { name: "Indie", symbol: "🇮🇳", region: "Asia" },
-            { name: "Australia", symbol: "🇦🇺", region: "Oceania" },
-            { name: "Nowa Zelandia", symbol: "🇳🇿", region: "Oceania" },
-            { name: "RPA", symbol: "🇿🇦", region: "Africa" },
-            { name: "Egipt", symbol: "🇪🇬", region: "Africa" },
-            // ...możesz dopisać więcej pozycji jeśli chcesz...
+            { name: "Polska", symbol: "🇵🇱", region: "Europe", type: "country" },
+            { name: "Niemcy", symbol: "🇩🇪", region: "Europe", type: "country" },
+            { name: "Włochy", symbol: "🇮🇹", region: "Europe", type: "country" },
+            { name: "Hiszpania", symbol: "🇪🇸", region: "Europe", type: "country" },
+            { name: "Francja", symbol: "🇫🇷", region: "Europe", type: "country" },
+            { name: "Wielka Brytania", symbol: "🇬🇧", region: "Europe", type: "country" },
+            { name: "Szwecja", symbol: "🇸🇪", region: "Europe", type: "country" },
+            { name: "Norwegia", symbol: "🇳🇴", region: "Europe", type: "country" },
+            { name: "Holandia", symbol: "🇳🇱", region: "Europe", type: "country" },
+            { name: "Portugalia", symbol: "🇵🇹", region: "Europe", type: "country" },
+            { name: "Stany Zjednoczone", symbol: "🇺🇸", region: "Americas", type: "country" },
+            { name: "Kanada", symbol: "🇨🇦", region: "Americas", type: "country" },
+            { name: "Brazylia", symbol: "🇧🇷", region: "Americas", type: "country" },
+            { name: "Meksyk", symbol: "🇲🇽", region: "Americas", type: "country" },
+            { name: "Argentyna", symbol: "🇦🇷", region: "Americas", type: "country" },
+            { name: "Japonia", symbol: "🇯🇵", region: "Asia", type: "country" },
+            { name: "Chiny", symbol: "🇨🇳", region: "Asia", type: "country" },
+            { name: "Indie", symbol: "🇮🇳", region: "Asia", type: "country" },
+            { name: "Australia", symbol: "🇦🇺", region: "Oceania", type: "country" },
+            { name: "Nowa Zelandia", symbol: "🇳🇿", region: "Oceania", type: "country" },
+            { name: "RPA", symbol: "🇿🇦", region: "Africa", type: "country" },
+            { name: "Egipt", symbol: "🇪🇬", region: "Africa", type: "country" },
         ];
-        // Rozszerzona pula flag: zawiera bardziej egzotyczne/islandowe państwa (używana dla "Bardzo trudny")
         const allFlagsExtended = allFlags.concat([
-            { name: "Islandia", symbol: "🇮🇸", region: "Europe" },
-            { name: "Islandy (Faroe)", symbol: "🇫🇴", region: "Europe" },
-            { name: "Malediwy", symbol: "🇲🇻", region: "Asia" },
-            { name: "Fidżi", symbol: "🇫🇯", region: "Oceania" },
-            { name: "Bahamy", symbol: "🇧🇸", region: "Americas" },
-            { name: "Bermudy", symbol: "🇧🇲", region: "Americas" },
-            { name: "Seszele", symbol: "🇸🇨", region: "Africa" },
-            { name: "Mauritius", symbol: "🇲🇺", region: "Africa" },
-            { name: "Kiribati", symbol: "🇰🇮", region: "Oceania" },
-            { name: "Nauru", symbol: "🇳🇷", region: "Oceania" },
-            { name: "Palau", symbol: "🇵🇼", region: "Oceania" },
-            { name: "Wyspy Marshalla", symbol: "🇲🇭", region: "Oceania" },
-            { name: "Saint Kitts i Nevis", symbol: "🇰🇳", region: "Americas" },
-            { name: "Antigua i Barbuda", symbol: "🇦🇬", region: "Americas" },
-            // ...możesz dopisać więcej państewek/wysp według potrzeby...
+            { name: "Islandia", symbol: "🇮🇸", region: "Europe", type: "island" },
+            { name: "Islandy (Faroe)", symbol: "🇫🇴", region: "Europe", type: "island" },
+            { name: "Malediwy", symbol: "🇲🇻", region: "Asia", type: "island" },
+            { name: "Fidżi", symbol: "🇫🇯", region: "Oceania", type: "island" },
+            { name: "Bahamy", symbol: "🇧🇸", region: "Americas", type: "island" },
+            { name: "Bermudy", symbol: "🇧🇲", region: "Americas", type: "island" },
+            { name: "Seszele", symbol: "🇸🇨", region: "Africa", type: "island" },
+            { name: "Mauritius", symbol: "🇲🇺", region: "Africa", type: "island" },
+            { name: "Kiribati", symbol: "🇰🇮", region: "Oceania", type: "island" },
+            { name: "Nauru", symbol: "🇳🇷", region: "Oceania", type: "island" },
+            { name: "Palau", symbol: "🇵🇼", region: "Oceania", type: "island" },
+            { name: "Wyspy Marshalla", symbol: "🇲🇭", region: "Oceania", type: "island" },
+            { name: "Saint Kitts i Nevis", symbol: "🇰🇳", region: "Americas", type: "island" },
+            { name: "Antigua i Barbuda", symbol: "🇦🇬", region: "Americas", type: "island" },
         ]);
         // ------------------
 
@@ -354,6 +338,7 @@
             document.getElementById('logoImage').style.display = 'block';
             menuContainer.innerHTML = '';
             
+            // Usunięto niepotrzebne kategorie, zostaje tylko "Kraje (Flagi)"
             Object.keys(allQuizData).forEach(categoryName => {
                 const button = document.createElement('button');
                 button.textContent = categoryName;
@@ -396,8 +381,8 @@
                 }
                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol }));
             } else {
-                currentQuizData = allQuizData[categoryName].slice();
-                currentPool = currentQuizData.slice();
+                // Usunięto obsługę innych kategorii
+                // (niepotrzebne, bo nie ma innych kategorii)
             }
             shuffleArray(currentQuizData);
             currentQuestionIndex = 0;
@@ -494,9 +479,14 @@
             // Zbieramy odpowiedzi z currentPool (dostosowanej puli)
             let options = [currentQuestion.symbol];
             let incorrectSymbols = [];
+            const questionType = currentQuestion.type;
+            
             currentPool.forEach(item => {
                 if (item.symbol && item.symbol !== currentQuestion.symbol) {
-                    incorrectSymbols.push(item.symbol);
+                    // Filtrujemy odpowiedzi po typie (kraju vs wyspy)
+                    if (!questionType || item.type === questionType) {
+                        incorrectSymbols.push(item.symbol);
+                    }
                 }
             });
             shuffleArray(incorrectSymbols);
