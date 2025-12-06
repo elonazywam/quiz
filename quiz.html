@@ -365,12 +365,12 @@
             // zachowujemy referencję ostatniej konfiguracji (do ewentualnego powtórzenia)
             lastCategory = categoryName;
             lastDifficulty = difficulty;
- 
+
             // Wybór puli pytań zależnie od kategorii i poziomu trudności
             if (categoryName === "Kraje (Flagi)") {
                 if (difficulty === 'Bardzo trudny') {
-                    // pełna, rozszerzona baza zawierająca wyspy i małe państewka
-                    currentPool = allFlagsExtended.slice();
+                    // tylko wyspy (type: "island") z rozszerzonej listy
+                    currentPool = allFlagsExtended.filter(item => item.type === "island");
                 } else if (difficulty === 'Trudny') {
                     // duża pula (cały świat, ale bez dodatkowych wysp z rozszerzonej listy)
                     currentPool = allFlags.slice();
@@ -379,7 +379,7 @@
                 } else {
                     currentPool = allQuizData["Kraje (Flagi)"].slice();
                 }
-                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol }));
+                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
             } else {
                 // Usunięto obsługę innych kategorii
                 // (niepotrzebne, bo nie ma innych kategorii)
