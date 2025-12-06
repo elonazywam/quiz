@@ -373,37 +373,59 @@
         function loadQuestion() {
             // Jeżeli osiągnięto zaplanowaną liczbę pytań -> pokaż podsumowanie
             if (currentQuestionIndex >= totalQuestions) {
-                // Podsumowanie wyników: tabela z błędami
+                // Podsumowanie wyników: tabela z odpowiedziami (wszystkie)
                 questionTextElement.textContent = "Koniec Quizu!";
                 symbolDisplayElement.textContent = "🎉";
-                
+
                 let wrongCount = totalQuestions - score;
                 let summaryHtml = `<div style="text-align:left;">
                     <p>Twoje wyniki: <strong>${score}</strong> poprawnych, <strong>${wrongCount}</strong> błędnych (z ${totalQuestions}).</p>`;
 
-                if (incorrectAnswers.length > 0) {
-                    summaryHtml += `<table style="width:100%; border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Pytanie</th>
-                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Twoja odpowiedź</th>
-                                <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Poprawna odpowiedź</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-                    incorrectAnswers.forEach(item => {
-                        summaryHtml += `<tr>
-                            <td style="padding:6px; border-top:1px solid #eee;">${item.name}</td>
-                            <td style="padding:6px; border-top:1px solid #eee;">${item.selected}</td>
-                            <td style="padding:6px; border-top:1px solid #eee;">${item.correct}</td>
-                        </tr>`;
-                    });
-                    summaryHtml += `</tbody></table>`;
-                } else {
-                    summaryHtml += `<p>Gratulacje! Wszystkie odpowiedzi poprawne 🎉</p>`;
+                // Zbuduj pełną listę odpowiedzi użytkownika (poprawne i błędne)
+                let allAnswers = [];
+                for (let i = 0; i < totalQuestions; i++) {
+                    const q = currentQuizData[i];
+                    // Szukamy czy była błędna odpowiedź dla tego pytania
+                    const wrong = incorrectAnswers.find(item => item.name === q.name);
+                    if (wrong) {
+                        allAnswers.push({
+                            name: q.name,
+                            selected: wrong.selected,
+                            correct: q.symbol,
+                            isCorrect: false
+                        });
+                    } else {
+                        allAnswers.push({
+                            name: q.name,
+                            selected: q.symbol,
+                            correct: q.symbol,
+                            isCorrect: true
+                        });
+                    }
                 }
 
-                // Opcje po zakończeniu: powrót do menu lub spróbuj ponownie ten sam quiz
+                summaryHtml += `<table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Pytanie</th>
+                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Twoja odpowiedź</th>
+                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Poprawna odpowiedź</th>
+                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                allAnswers.forEach(item => {
+                    summaryHtml += `<tr>
+                        <td style="padding:6px; border-top:1px solid #eee;">${item.name}</td>
+                        <td style="padding:6px; border-top:1px solid #eee;">${item.selected}</td>
+                        <td style="padding:6px; border-top:1px solid #eee;">${item.correct}</td>
+                        <td style="padding:6px; border-top:1px solid #eee; color:${item.isCorrect ? '#2ecc71' : '#e74c3c'};">
+                            ${item.isCorrect ? '✔️' : '❌'}
+                        </td>
+                    </tr>`;
+                });
+                summaryHtml += `</tbody></table>`;
+
                 summaryHtml += `<div style="margin-top:12px;">
                     <button onclick="showSection('menu')" style="margin-right:8px;">Wróć do Menu</button>
                     <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">Spróbuj ponownie tę samą kategorię</button>
