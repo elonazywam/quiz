@@ -487,6 +487,9 @@
                 button.onclick = () => checkAnswer(button, option, currentQuestion.symbol, currentQuestion.name);
                 optionsContainer.appendChild(button);
             });
+
+            // Zamiast wyniku, pokazujemy numer pytania
+            scoreElement.textContent = `Ilość: ${currentQuestionIndex + 1} / ${totalQuestions}`;
         }
         
         function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol, questionName) {
@@ -519,8 +522,10 @@
             }
 
             answeredCount++;
-            // Pokaż postęp: ile poprawnych na ile docelowych
-            scoreElement.textContent = `Wynik: ${score} / ${totalQuestions}`;
+            // Zamiast wyniku, pokazujemy numer pytania (jeśli nie koniec)
+            if (currentQuestionIndex + 1 < totalQuestions) {
+                scoreElement.textContent = `Ilość: ${currentQuestionIndex + 2} / ${totalQuestions}`;
+            }
 
             setTimeout(() => {
                 currentQuestionIndex++;
