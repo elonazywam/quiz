@@ -50,10 +50,17 @@
         }
         
         .logo {
-            width: 120px;
-            height: 120px;
+            width: 150px; /* powiększone z 120px */
+            height: 150px; /* powiększone z 120px */
             margin: 20px auto;
             object-fit: contain;
+        }
+        /* Mała responsywna poprawka */
+        @media (max-width: 420px) {
+            .logo {
+                width: 120px;
+                height: 120px;
+            }
         }
         
         /* ZMIANA UKŁADU MENU */
