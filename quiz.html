@@ -18,7 +18,9 @@
             margin: 0; /* poprawka: usunięte przypadkowe 'i' */
             color: #ecf0f1; 
             position: relative;
-            overflow: hidden;
+            /* Pozwól na przewijanie na małych ekranach */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* płynne przewijanie na iOS */
         }
         
         /* łagodne przyciemnienie nad tłem, ale nie tłumiące koloru */
@@ -40,9 +42,15 @@
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
             width: 90%;
-            max-width: 800px; 
+            max-width: 800px;
+            /* Na małych ekranach pozwalamy kontenerowi przewijać zawartość */
+            max-height: 95vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             text-align: center;
-            z-index: 1; 
+            z-index: 1;
+            box-sizing: border-box;
+            padding-bottom: calc(30px + env(safe-area-inset-bottom)); /* bezpieczny margines dolny na urządzeniach z wycięciem */
         }
         h1 {
             color: #f1c40f; 
