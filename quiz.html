@@ -239,6 +239,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <!-- Tłumaczenia -->
     <script src="i18n.js"></script>
 </head>
@@ -281,10 +283,17 @@
             <p id="questionPrompt">Jaki symbol reprezentuje:</p>
             <div id="questionText" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
             
-            <div id="symbolDisplay" class="symbol-display">?</div>
+            <!-- Dla trybu standardowego (flagi) -->
+            <div id="standardQuizMode">
+                <div id="symbolDisplay" class="symbol-display">?</div>
+                <div id="options" class="options"></div>
+            </div>
 
-            <div id="options" class="options">
-                </div>
+            <!-- Dla trybu mapy -->
+            <div id="mapQuizMode" style="display: none;">
+                <p id="mapPrompt" style="margin: 10px 0; font-size: 16px;">Kliknij na mapie, gdzie znajduje się ten kraj</p>
+                <div id="map" style="width: 100%; height: 500px; border-radius: 8px; margin-bottom: 15px; border: 2px solid #bdc3c7;"></div>
+            </div>
 
             <div id="feedback" class="feedback"></div>
 
@@ -292,6 +301,13 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <!-- Map Quiz Logic -->
+    <script src="map-quiz.js"></script>
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -675,28 +691,27 @@
 
         function startQuiz(categoryName, difficultyKey, useMap = false) {
             mapMode = !!useMap;
-             lastCategory = categoryName;
-             lastDifficulty = difficultyKey; // save internal key
-             // Zmieniona logika poziomów:
-             // medium -> Europa, hard -> wszystkie kraje, very -> wyspy
-             if (categoryName === "Kraje (Flagi)") {
-                 if (difficultyKey === 'very') {
-                     currentPool = allFlagsExtended.filter(item => item.type === "island");
-                 } else if (difficultyKey === 'hard') {
-                     currentPool = allFlags.slice();
-                 } else { // medium
-                     currentPool = allFlags.filter(f => f.region === 'Europe');
-                 }
-                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
-             }
-             shuffleArray(currentQuizData);
-             currentQuestionIndex = 0;
-             score = 0;
-             totalQuestions = Math.min(10, currentQuizData.length);
-             answeredCount = 0;
-             incorrectAnswers = [];
+            lastCategory = categoryName;
+            lastDifficulty = difficultyKey;
+            
+            if (categoryName === "Kraje (Flagi)") {
+                if (difficultyKey === 'very') {
+                    currentPool = allFlagsExtended.filter(item => item.type === "island");
+                } else if (difficultyKey === 'hard') {
+                    currentPool = allFlags.slice();
+                } else { // medium
+                    currentPool = allFlags.filter(f => f.region === 'Europe');
+                }
+                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
+            }
+            
+            shuffleArray(currentQuizData);
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = Math.min(10, currentQuizData.length);
+            answeredCount = 0;
+            incorrectAnswers = [];
 
-            // Bezpieczne etykiety kategorii / poziomu (fallback gdy brak tłumaczeń)
             const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
             const catLabel = (t.categoryMap && t.categoryMap[categoryName]) ? t.categoryMap[categoryName] : categoryName;
             let diffLabel;
@@ -704,35 +719,34 @@
             else if (difficultyKey === 'hard') diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : 'Średni';
             else diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : 'Łatwy';
             mainTitle.textContent = `${catLabel} - Poziom: ${diffLabel}`;
-             document.getElementById('logoImage').style.display = 'none';
-             menuContainer.style.display = 'none';
-             aboutContent.style.display = 'none';
-             document.getElementById('opinionsContent').style.display = 'none';
-             quizContent.style.display = 'block';
-             loadQuestion();
+            
+            document.getElementById('logoImage').style.display = 'none';
+            menuContainer.style.display = 'none';
+            aboutContent.style.display = 'none';
+            document.getElementById('opinionsContent').style.display = 'none';
+            quizContent.style.display = 'block';
+            
+            loadQuestion();
         }
 
         function loadQuestion() {
-            // bezpieczne tłumaczenia (fallback)
             const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {
                 mainTitle: 'Koniec Quizu!',
                 summaryBackToMenu: 'Powrót',
                 summaryTryAgain: 'Jeszcze raz',
-                loadingOpinions: 'Ładowanie opinii...',
-                noOpinions: 'Brak opinii',
-                alertEmptyOpinion: 'Wpisz opinię',
-                alertThankYou: 'Dziękujemy!',
-                alertOpinionError: 'Błąd przy wysyłaniu opinii',
             };
 
             if (currentQuestionIndex >= totalQuestions) {
-                questionTextElement.textContent = t.mainTitle; // lub "Koniec Quizu!"
+                destroyMap();
+                questionTextElement.textContent = t.mainTitle;
                 symbolDisplayElement.textContent = "🎉";
+                document.getElementById('standardQuizMode').style.display = 'none';
+                document.getElementById('mapQuizMode').style.display = 'none';
+                
                 let wrongCount = totalQuestions - score;
                 let summaryHtml = `<div style="text-align:left;">
                     <p>Twoje wyniki: <strong>${score}</strong> poprawnych, <strong>${wrongCount}</strong> błędnych (z ${totalQuestions}).</p>`;
 
-                // Zbuduj pełną listę odpowiedzi użytkownika (poprawne i błędne)
                 let allAnswers = [];
                 for (let i = 0; i < totalQuestions; i++) {
                     const q = currentQuizData[i];
@@ -778,7 +792,7 @@
 
                 summaryHtml += `<div style="margin-top:12px;">
                     <button onclick="showSection('menu')" style="margin-right:8px;">${t.summaryBackToMenu}</button>
-                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">${t.summaryTryAgain}</button>
+                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}', ${mapMode})">${t.summaryTryAgain}</button>
                 </div>
                 </div>`;
 
@@ -790,37 +804,47 @@
 
             const currentQuestion = currentQuizData[currentQuestionIndex];
             questionTextElement.textContent = currentQuestion.name;
-            symbolDisplayElement.textContent = "?";
-            optionsContainer.innerHTML = '';
             feedbackElement.textContent = '';
-
-            let options = [currentQuestion.symbol];
-            let incorrectSymbols = [];
-            const questionType = currentQuestion.type;
-
-            currentPool.forEach(item => {
-                if (item.symbol && item.symbol !== currentQuestion.symbol) {
-                    if (!questionType || item.type === questionType) {
-                        incorrectSymbols.push(item.symbol);
-                    }
-                }
-            });
-            shuffleArray(incorrectSymbols);
-            options = options.concat(incorrectSymbols.slice(0, Math.min(3, incorrectSymbols.length)));
-            shuffleArray(options);
-
-            options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.onclick = () => checkAnswer(button, option, currentQuestion.symbol, currentQuestion.name);
-                optionsContainer.appendChild(button);
-            });
-
             scoreElement.textContent = `Ilość: ${currentQuestionIndex + 1} / ${totalQuestions}`;
+
+            if (mapMode) {
+                // Tryb mapy
+                document.getElementById('standardQuizMode').style.display = 'none';
+                document.getElementById('mapQuizMode').style.display = 'block';
+                initMapQuiz(currentQuestion.name);
+            } else {
+                // Tryb standardowy (flagi)
+                document.getElementById('standardQuizMode').style.display = 'block';
+                document.getElementById('mapQuizMode').style.display = 'none';
+                
+                symbolDisplayElement.textContent = "?";
+                optionsContainer.innerHTML = '';
+
+                let options = [currentQuestion.symbol];
+                let incorrectSymbols = [];
+                const questionType = currentQuestion.type;
+
+                currentPool.forEach(item => {
+                    if (item.symbol && item.symbol !== currentQuestion.symbol) {
+                        if (!questionType || item.type === questionType) {
+                            incorrectSymbols.push(item.symbol);
+                        }
+                    }
+                });
+                shuffleArray(incorrectSymbols);
+                options = options.concat(incorrectSymbols.slice(0, Math.min(3, incorrectSymbols.length)));
+                shuffleArray(options);
+
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.onclick = () => checkAnswer(button, option, currentQuestion.symbol, currentQuestion.name);
+                    optionsContainer.appendChild(button);
+                });
+            }
         }
-        
+
         function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol, questionName) {
-            // bezpieczne tłumaczenia (fallback)
             const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {
                 feedback: { correct: 'Poprawna odpowiedź!', incorrectPrefix: 'Niepoprawna. Poprawna: ' }
             };
