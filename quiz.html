@@ -609,12 +609,15 @@
             menuContainer.innerHTML = '';
             document.getElementById('logoImage').style.display = 'none';
 
-            // difficulty keys (internal) mapped to labels (z fallbackami)
-            const keys = ['easy','medium','hard','very'];
+            // Nowe klucze poziomów: tylko medium, hard, very
+            // Mapa: medium -> łatwy, hard -> średni, very -> trudny
+            const keys = ['medium','hard','very'];
             keys.forEach(key => {
                 const btn = document.createElement('button');
-                const label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key]
-                    : (key === 'very' ? 'Bardzo trudny' : key === 'hard' ? 'Trudny' : key === 'medium' ? 'Średni' : 'Łatwy');
+                let label;
+                if (key === 'very') label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Trudny';
+                else if (key === 'hard') label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Średni';
+                else label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Łatwy';
                 btn.textContent = label;
                 btn.onclick = () => startQuiz(categoryName, key);
                 menuContainer.appendChild(btn);
@@ -624,19 +627,18 @@
         function startQuiz(categoryName, difficultyKey) {
             lastCategory = categoryName;
             lastDifficulty = difficultyKey; // save internal key
-             // Wybór puli pytań zależnie od kategorii i poziomu trudności (używamy kluczy)
-             if (categoryName === "Kraje (Flagi)") {
-                 if (difficultyKey === 'very') {
-                     currentPool = allFlagsExtended.filter(item => item.type === "island");
-                 } else if (difficultyKey === 'hard') {
-                     currentPool = allFlags.slice();
-                 } else if (difficultyKey === 'medium') {
-                     currentPool = allFlags.filter(f => f.region === 'Europe');
-                 } else { // easy
-                     currentPool = allQuizData["Kraje (Flagi)"].slice();
-                 }
-                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
-             }
+            // Zmieniona logika poziomów:
+            // medium -> Europa, hard -> wszystkie kraje, very -> wyspy
+            if (categoryName === "Kraje (Flagi)") {
+                if (difficultyKey === 'very') {
+                    currentPool = allFlagsExtended.filter(item => item.type === "island");
+                } else if (difficultyKey === 'hard') {
+                    currentPool = allFlags.slice();
+                } else { // medium
+                    currentPool = allFlags.filter(f => f.region === 'Europe');
+                }
+                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
+            }
              shuffleArray(currentQuizData);
              currentQuestionIndex = 0;
              score = 0;
@@ -647,7 +649,10 @@
             // Bezpieczne etykiety kategorii / poziomu (fallback gdy brak tłumaczeń)
             const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
             const catLabel = (t.categoryMap && t.categoryMap[categoryName]) ? t.categoryMap[categoryName] : categoryName;
-            const diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : difficultyKey;
+            let diffLabel;
+            if (difficultyKey === 'very') diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : 'Trudny';
+            else if (difficultyKey === 'hard') diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : 'Średni';
+            else diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : 'Łatwy';
             mainTitle.textContent = `${catLabel} - Poziom: ${diffLabel}`;
              document.getElementById('logoImage').style.display = 'none';
              menuContainer.style.display = 'none';
