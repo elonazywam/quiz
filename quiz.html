@@ -811,7 +811,28 @@
                 // Tryb mapy
                 document.getElementById('standardQuizMode').style.display = 'none';
                 document.getElementById('mapQuizMode').style.display = 'block';
-                initMapQuiz(currentQuestion.name);
+
+                // Bezpieczna inicjalizacja mapy jeśli funkcja jest dostępna
+                if (typeof initMapQuiz === 'function') {
+                    initMapQuiz(currentQuestion.name);
+                }
+
+                // Leaflet często potrzebuje invalidateSize() po tym, jak kontener staje się widoczny.
+                // Dajemy małe opóźnienie, aby DOM się wyrenderował, i wywołujemy invalidateSize() jeżeli map-quiz.js
+                // udostępnia globalny obiekt (np. window.quizMap). Dodajemy też fallback na ewentualną funkcję resizeMap().
+                setTimeout(() => {
+                    try {
+                        if (window.quizMap && typeof window.quizMap.invalidateSize === 'function') {
+                            window.quizMap.invalidateSize(true);
+                        } else if (typeof resizeMap === 'function') {
+                            resizeMap();
+                        }
+                    } catch (e) {
+                        // cichy fallback — nic nie róbmy, żeby nie przerywać działania quizu
+                        console.warn('Map resize failed:', e);
+                    }
+                }, 200);
+
             } else {
                 // Tryb standardowy (flagi)
                 document.getElementById('standardQuizMode').style.display = 'block';
