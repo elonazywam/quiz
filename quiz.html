@@ -206,6 +206,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+    <!-- Tłumaczenia -->
+    <script src="i18n.js"></script>
 </head>
 <body>
 
@@ -277,7 +279,6 @@
         }
 
         // --- BAZA PYTAŃ ---
-        // Zachowujemy mały zestaw dla poziomu "Łatwy"
         const allQuizData = {
             "Kraje (Flagi)": [
                 { name: "Polska", symbol: "🇵🇱" },
@@ -286,10 +287,10 @@
                 { name: "Hiszpania", symbol: "🇪🇸" },
                 { name: "Francja", symbol: "🇫🇷" },
             ]
-            // Usunięto: "Zwierzęta (Emoji)" i "Jedzenie i Picie"
         };
-        // Dodatkowa pełna pula flag z oznaczeniem regionu (używana dla Średni/Trudny)
+
         const allFlags = [
+            // EUROPA
             { name: "Polska", symbol: "🇵🇱", region: "Europe", type: "country" },
             { name: "Niemcy", symbol: "🇩🇪", region: "Europe", type: "country" },
             { name: "Włochy", symbol: "🇮🇹", region: "Europe", type: "country" },
@@ -300,34 +301,212 @@
             { name: "Norwegia", symbol: "🇳🇴", region: "Europe", type: "country" },
             { name: "Holandia", symbol: "🇳🇱", region: "Europe", type: "country" },
             { name: "Portugalia", symbol: "🇵🇹", region: "Europe", type: "country" },
-            { name: "Stany Zjednoczone", symbol: "🇺🇸", region: "Americas", type: "country" },
-            { name: "Kanada", symbol: "🇨🇦", region: "Americas", type: "country" },
-            { name: "Brazylia", symbol: "🇧🇷", region: "Americas", type: "country" },
-            { name: "Meksyk", symbol: "🇲🇽", region: "Americas", type: "country" },
-            { name: "Argentyna", symbol: "🇦🇷", region: "Americas", type: "country" },
+            { name: "Belgia", symbol: "🇧🇪", region: "Europe", type: "country" },
+            { name: "Szwajcaria", symbol: "🇨🇭", region: "Europe", type: "country" },
+            { name: "Austria", symbol: "🇦🇹", region: "Europe", type: "country" },
+            { name: "Grecja", symbol: "🇬🇷", region: "Europe", type: "country" },
+            { name: "Czechy", symbol: "🇨🇿", region: "Europe", type: "country" },
+            { name: "Słowacja", symbol: "🇸🇰", region: "Europe", type: "country" },
+            { name: "Węgry", symbol: "🇭🇺", region: "Europe", type: "country" },
+            { name: "Rumunia", symbol: "🇷🇴", region: "Europe", type: "country" },
+            { name: "Bułgaria", symbol: "🇧🇬", region: "Europe", type: "country" },
+            { name: "Serbia", symbol: "🇷🇸", region: "Europe", type: "country" },
+            { name: "Chorwacja", symbol: "🇭🇷", region: "Europe", type: "country" },
+            { name: "Słowenia", symbol: "🇸🇮", region: "Europe", type: "country" },
+            { name: "Bośnia i Hercegowina", symbol: "🇧🇦", region: "Europe", type: "country" },
+            { name: "Monako", symbol: "🇲🇨", region: "Europe", type: "country" },
+            { name: "Liechtenstein", symbol: "🇱🇮", region: "Europe", type: "country" },
+            { name: "Luksemburg", symbol: "🇱🇺", region: "Europe", type: "country" },
+            { name: "Dania", symbol: "🇩🇰", region: "Europe", type: "country" },
+            { name: "Finlandia", symbol: "🇫🇮", region: "Europe", type: "country" },
+            { name: "Rosja", symbol: "🇷🇺", region: "Europe", type: "country" },
+            { name: "Ukraina", symbol: "🇺🇦", region: "Europe", type: "country" },
+            { name: "Białoruś", symbol: "🇧🇾", region: "Europe", type: "country" },
+            { name: "Mołdawia", symbol: "🇲🇩", region: "Europe", type: "country" },
+            { name: "Litwa", symbol: "🇱🇹", region: "Europe", type: "country" },
+            { name: "Łotwa", symbol: "🇱🇻", region: "Europe", type: "country" },
+            { name: "Estonia", symbol: "🇪🇪", region: "Europe", type: "country" },
+            { name: "Albania", symbol: "🇦🇱", region: "Europe", type: "country" },
+            { name: "Kosowo", symbol: "🇽🇰", region: "Europe", type: "country" },
+            { name: "Macedonia", symbol: "🇲🇰", region: "Europe", type: "country" },
+            { name: "Cypr", symbol: "🇨🇾", region: "Europe", type: "country" },
+            { name: "Malta", symbol: "🇲🇹", region: "Europe", type: "country" },
+            { name: "Islandia", symbol: "🇮🇸", region: "Europe", type: "country" },
+            { name: "Irlandia", symbol: "🇮🇪", region: "Europe", type: "country" },
+            { name: "San Marino", symbol: "🇸🇲", region: "Europe", type: "country" },
+            { name: "Watykan", symbol: "🇻🇦", region: "Europe", type: "country" },
+            // AZJA
             { name: "Japonia", symbol: "🇯🇵", region: "Asia", type: "country" },
             { name: "Chiny", symbol: "🇨🇳", region: "Asia", type: "country" },
             { name: "Indie", symbol: "🇮🇳", region: "Asia", type: "country" },
+            { name: "Korea Południowa", symbol: "🇰🇷", region: "Asia", type: "country" },
+            { name: "Korea Północna", symbol: "🇰🇵", region: "Asia", type: "country" },
+            { name: "Tajlandia", symbol: "🇹🇭", region: "Asia", type: "country" },
+            { name: "Wietnam", symbol: "🇻🇳", region: "Asia", type: "country" },
+            { name: "Kambodża", symbol: "🇰🇭", region: "Asia", type: "country" },
+            { name: "Laos", symbol: "🇱🇦", region: "Asia", type: "country" },
+            { name: "Myanmar", symbol: "🇲🇲", region: "Asia", type: "country" },
+            { name: "Malezja", symbol: "🇲🇾", region: "Asia", type: "country" },
+            { name: "Singapur", symbol: "🇸🇬", region: "Asia", type: "country" },
+            { name: "Indonezja", symbol: "🇮🇩", region: "Asia", type: "country" },
+            { name: "Filipiny", symbol: "🇵🇭", region: "Asia", type: "country" },
+            { name: "Bangladesz", symbol: "🇧🇩", region: "Asia", type: "country" },
+            { name: "Pakistan", symbol: "🇵🇰", region: "Asia", type: "country" },
+            { name: "Afganistan", symbol: "🇦🇫", region: "Asia", type: "country" },
+            { name: "Iran", symbol: "🇮🇷", region: "Asia", type: "country" },
+            { name: "Irak", symbol: "🇮🇶", region: "Asia", type: "country" },
+            { name: "Syria", symbol: "🇸🇾", region: "Asia", type: "country" },
+            { name: "Liban", symbol: "🇱🇧", region: "Asia", type: "country" },
+            { name: "Izrael", symbol: "🇮🇱", region: "Asia", type: "country" },
+            { name: "Palestyna", symbol: "🇵🇸", region: "Asia", type: "country" },
+            { name: "Jordania", symbol: "🇯🇴", region: "Asia", type: "country" },
+            { name: "Arabia Saudyjska", symbol: "🇸🇦", region: "Asia", type: "country" },
+            { name: "Jemen", symbol: "🇾🇪", region: "Asia", type: "country" },
+            { name: "Oman", symbol: "🇴🇲", region: "Asia", type: "country" },
+            { name: "ZEA", symbol: "🇦🇪", region: "Asia", type: "country" },
+            { name: "Katar", symbol: "🇶🇦", region: "Asia", type: "country" },
+            { name: "Bahrajn", symbol: "🇧🇭", region: "Asia", type: "country" },
+            { name: "Kuwejt", symbol: "🇰🇼", region: "Asia", type: "country" },
+            { name: "Turcja", symbol: "🇹🇷", region: "Asia", type: "country" },
+            { name: "Kazachstan", symbol: "🇰🇿", region: "Asia", type: "country" },
+            { name: "Uzbekistan", symbol: "🇺🇿", region: "Asia", type: "country" },
+            { name: "Turkmenistan", symbol: "🇹🇲", region: "Asia", type: "country" },
+            { name: "Kirgistan", symbol: "🇰🇬", region: "Asia", type: "country" },
+            { name: "Tadżykistan", symbol: "🇹🇯", region: "Asia", type: "country" },
+            { name: "Mongolia", symbol: "🇲🇳", region: "Asia", type: "country" },
+            { name: "Nepal", symbol: "🇳🇵", region: "Asia", type: "country" },
+            { name: "Bhutan", symbol: "🇧🇹", region: "Asia", type: "country" },
+            { name: "Sri Lanka", symbol: "🇱🇰", region: "Asia", type: "country" },
+            { name: "Tajwan", symbol: "🇹🇼", region: "Asia", type: "country" },
+            { name: "Brunei", symbol: "🇧🇳", region: "Asia", type: "country" },
+            { name: "Timor Wschodni", symbol: "🇹🇱", region: "Asia", type: "country" },
+            { name: "Hong Kong", symbol: "🇭🇰", region: "Asia", type: "country" },
+            // AFRYKA
+            { name: "Egipt", symbol: "🇪🇬", region: "Africa", type: "country" },
+            { name: "Libia", symbol: "🇱🇾", region: "Africa", type: "country" },
+            { name: "Tunezja", symbol: "🇹🇳", region: "Africa", type: "country" },
+            { name: "Algieria", symbol: "🇩🇿", region: "Africa", type: "country" },
+            { name: "Maroko", symbol: "🇲🇦", region: "Africa", type: "country" },
+            { name: "Sudan", symbol: "🇸🇩", region: "Africa", type: "country" },
+            { name: "Sudan Południowy", symbol: "🇸🇸", region: "Africa", type: "country" },
+            { name: "Etiopia", symbol: "🇪🇹", region: "Africa", type: "country" },
+            { name: "Eritrea", symbol: "🇪🇷", region: "Africa", type: "country" },
+            { name: "Dżibuti", symbol: "🇩🇯", region: "Africa", type: "country" },
+            { name: "Somalia", symbol: "🇸🇴", region: "Africa", type: "country" },
+            { name: "Kenia", symbol: "🇰🇪", region: "Africa", type: "country" },
+            { name: "Uganda", symbol: "🇺🇬", region: "Africa", type: "country" },
+            { name: "Tanzania", symbol: "🇹🇿", region: "Africa", type: "country" },
+            { name: "Rwanda", symbol: "🇷🇼", region: "Africa", type: "country" },
+            { name: "Burundi", symbol: "🇧🇮", region: "Africa", type: "country" },
+            { name: "DRK", symbol: "🇨🇩", region: "Africa", type: "country" },
+            { name: "Kongo", symbol: "🇨🇬", region: "Africa", type: "country" },
+            { name: "Gabon", symbol: "🇬🇦", region: "Africa", type: "country" },
+            { name: "Kamerun", symbol: "🇨🇲", region: "Africa", type: "country" },
+            { name: "Czad", symbol: "🇹🇩", region: "Africa", type: "country" },
+            { name: "Republika Środkowoafrykańska", symbol: "🇨🇫", region: "Africa", type: "country" },
+            { name: "Mauritania", symbol: "🇲🇷", region: "Africa", type: "country" },
+            { name: "Senegal", symbol: "🇸🇳", region: "Africa", type: "country" },
+            { name: "Gambia", symbol: "🇬🇲", region: "Africa", type: "country" },
+            { name: "Gwinea Bissau", symbol: "🇬🇼", region: "Africa", type: "country" },
+            { name: "Gwinea", symbol: "🇬🇳", region: "Africa", type: "country" },
+            { name: "Sierra Leone", symbol: "🇸🇱", region: "Africa", type: "country" },
+            { name: "Liberia", symbol: "🇱🇷", region: "Africa", type: "country" },
+            { name: "Mali", symbol: "🇲🇱", region: "Africa", type: "country" },
+            { name: "Burkina Faso", symbol: "🇧🇫", region: "Africa", type: "country" },
+            { name: "Gwinea Równikowa", symbol: "🇬🇶", region: "Africa", type: "country" },
+            { name: "Namibia", symbol: "🇳🇦", region: "Africa", type: "country" },
+            { name: "Botswana", symbol: "🇧🇼", region: "Africa", type: "country" },
+            { name: "Lesotho", symbol: "🇱🇸", region: "Africa", type: "country" },
+            { name: "Eswatini", symbol: "🇸🇿", region: "Africa", type: "country" },
+            { name: "RPA", symbol: "🇿🇦", region: "Africa", type: "country" },
+            { name: "Mozambik", symbol: "🇲🇿", region: "Africa", type: "country" },
+            { name: "Zimbabwe", symbol: "🇿🇼", region: "Africa", type: "country" },
+            { name: "Zambia", symbol: "🇿🇲", region: "Africa", type: "country" },
+            { name: "Malawi", symbol: "🇲🇼", region: "Africa", type: "country" },
+            { name: "Madagaskar", symbol: "🇲🇬", region: "Africa", type: "country" },
+            { name: "Mauritius", symbol: "🇲🇺", region: "Africa", type: "country" },
+            { name: "Seszele", symbol: "🇸🇨", region: "Africa", type: "country" },
+            { name: "Komory", symbol: "🇰🇲", region: "Africa", type: "country" },
+            { name: "Bénin", symbol: "🇧🇯", region: "Africa", type: "country" },
+            { name: "Togo", symbol: "🇹🇬", region: "Africa", type: "country" },
+            { name: "Ghana", symbol: "🇬🇭", region: "Africa", type: "country" },
+            { name: "Wybrzeże Kości Słoniowej", symbol: "🇨🇮", region: "Africa", type: "country" },
+            { name: "Angolia", symbol: "🇦🇴", region: "Africa", type: "country" },
+            { name: "Niger", symbol: "🇳🇪", region: "Africa", type: "country" },
+            { name: "Nigeria", symbol: "🇳🇬", region: "Africa", type: "country" },
+            // AMERYKA PÓŁNOCNA
+            { name: "Stany Zjednoczone", symbol: "🇺🇸", region: "Americas", type: "country" },
+            { name: "Kanada", symbol: "🇨🇦", region: "Americas", type: "country" },
+            { name: "Meksyk", symbol: "🇲🇽", region: "Americas", type: "country" },
+            { name: "Gwatemala", symbol: "🇬🇹", region: "Americas", type: "country" },
+            { name: "Belize", symbol: "🇧🇿", region: "Americas", type: "country" },
+            { name: "Honduras", symbol: "🇭🇳", region: "Americas", type: "country" },
+            { name: "El Salvador", symbol: "🇸🇻", region: "Americas", type: "country" },
+            { name: "Nikaragua", symbol: "🇳🇮", region: "Americas", type: "country" },
+            { name: "Kostaryka", symbol: "🇨🇷", region: "Americas", type: "country" },
+            { name: "Panama", symbol: "🇵🇦", region: "Americas", type: "country" },
+            { name: "Kuba", symbol: "🇨🇺", region: "Americas", type: "country" },
+            { name: "Dominikana", symbol: "🇩🇴", region: "Americas", type: "country" },
+            { name: "Haiti", symbol: "🇭🇹", region: "Americas", type: "country" },
+            { name: "Jamajka", symbol: "🇯🇲", region: "Americas", type: "country" },
+            { name: "Bahamy", symbol: "🇧🇸", region: "Americas", type: "country" },
+            { name: "Trynidad i Tobago", symbol: "🇹🇹", region: "Americas", type: "country" },
+            { name: "Barbados", symbol: "🇧🇧", region: "Americas", type: "country" },
+            // AMERYKA POŁUDNIOWA
+            { name: "Brazylia", symbol: "🇧🇷", region: "Americas", type: "country" },
+            { name: "Argentyna", symbol: "🇦🇷", region: "Americas", type: "country" },
+            { name: "Chile", symbol: "🇨🇱", region: "Americas", type: "country" },
+            { name: "Peru", symbol: "🇵🇪", region: "Americas", type: "country" },
+            { name: "Kolumbia", symbol: "🇨🇴", region: "Americas", type: "country" },
+            { name: "Wenezuela", symbol: "🇻🇪", region: "Americas", type: "country" },
+            { name: "Gujana", symbol: "🇬🇾", region: "Americas", type: "country" },
+            { name: "Surinam", symbol: "🇸🇷", region: "Americas", type: "country" },
+            { name: "Ekwador", symbol: "🇪🇨", region: "Americas", type: "country" },
+            { name: "Boliwia", symbol: "🇧🇴", region: "Americas", type: "country" },
+            { name: "Urugwaj", symbol: "🇺🇾", region: "Americas", type: "country" },
+            { name: "Paragwaj", symbol: "🇵🇾", region: "Americas", type: "country" },
+            // OCEANIA
             { name: "Australia", symbol: "🇦🇺", region: "Oceania", type: "country" },
             { name: "Nowa Zelandia", symbol: "🇳🇿", region: "Oceania", type: "country" },
-            { name: "RPA", symbol: "🇿🇦", region: "Africa", type: "country" },
-            { name: "Egipt", symbol: "🇪🇬", region: "Africa", type: "country" },
+            { name: "Fidżi", symbol: "🇫🇯", region: "Oceania", type: "country" },
+            { name: "Papua Nowa Gwinea", symbol: "🇵🇬", region: "Oceania", type: "country" },
+            { name: "Wyspy Salomona", symbol: "🇸🇧", region: "Oceania", type: "country" },
+            { name: "Vanuatu", symbol: "🇻🇺", region: "Oceania", type: "country" },
+            { name: "Samoa", symbol: "🇼🇸", region: "Oceania", type: "country" },
+            { name: "Kiribati", symbol: "🇰🇮", region: "Oceania", type: "country" },
+            { name: "Nauru", symbol: "🇳🇷", region: "Oceania", type: "country" },
+            { name: "Palau", symbol: "🇵🇼", region: "Oceania", type: "country" },
+            { name: "Wyspy Marshalla", symbol: "🇲🇭", region: "Oceania", type: "country" },
+            { name: "Mikronezja", symbol: "🇫🇲", region: "Oceania", type: "country" },
+            { name: "Tonga", symbol: "🇹🇴", region: "Oceania", type: "country" },
         ];
+
         const allFlagsExtended = allFlags.concat([
-            { name: "Islandia", symbol: "🇮🇸", region: "Europe", type: "island" },
-            { name: "Islandy (Faroe)", symbol: "🇫🇴", region: "Europe", type: "island" },
-            { name: "Malediwy", symbol: "🇲🇻", region: "Asia", type: "island" },
-            { name: "Fidżi", symbol: "🇫🇯", region: "Oceania", type: "island" },
-            { name: "Bahamy", symbol: "🇧🇸", region: "Americas", type: "island" },
+            // WYSPY
+            { name: "Wyspy Faroe", symbol: "🇫🇴", region: "Europe", type: "island" },
+            { name: "Grenladia", symbol: "🇬🇱", region: "Americas", type: "island" },
             { name: "Bermudy", symbol: "🇧🇲", region: "Americas", type: "island" },
-            { name: "Seszele", symbol: "🇸🇨", region: "Africa", type: "island" },
-            { name: "Mauritius", symbol: "🇲🇺", region: "Africa", type: "island" },
-            { name: "Kiribati", symbol: "🇰🇮", region: "Oceania", type: "island" },
-            { name: "Nauru", symbol: "🇳🇷", region: "Oceania", type: "island" },
-            { name: "Palau", symbol: "🇵🇼", region: "Oceania", type: "island" },
-            { name: "Wyspy Marshalla", symbol: "🇲🇭", region: "Oceania", type: "island" },
-            { name: "Saint Kitts i Nevis", symbol: "🇰🇳", region: "Americas", type: "island" },
-            { name: "Antigua i Barbuda", symbol: "🇦🇬", region: "Americas", type: "island" },
+            { name: "Kajmany", symbol: "🇰🇾", region: "Americas", type: "island" },
+            { name: "Turks i Caicos", symbol: "🇹🇨", region: "Americas", type: "island" },
+            { name: "Anguilla", symbol: "🇦🇮", region: "Americas", type: "island" },
+            { name: "Sint Maarten", symbol: "🇸🇽", region: "Americas", type: "island" },
+            { name: "Curaçao", symbol: "🇨🇼", region: "Americas", type: "island" },
+            { name: "Aruba", symbol: "🇦🇼", region: "Americas", type: "island" },
+            { name: "Porto Rico", symbol: "🇵🇷", region: "Americas", type: "island" },
+            { name: "Montserrat", symbol: "🇲🇸", region: "Americas", type: "island" },
+            { name: "Wyspa Świętej Heleny", symbol: "🇸🇭", region: "Africa", type: "island" },
+            { name: "Wyspa Bożego Narodzenia", symbol: "🇨🇽", region: "Oceania", type: "island" },
+            { name: "Wyspy Kokosowe", symbol: "🇨🇨", region: "Oceania", type: "island" },
+            { name: "Pólnocne Mariany", symbol: "🇲🇵", region: "Oceania", type: "island" },
+            { name: "Guam", symbol: "🇬🇺", region: "Oceania", type: "island" },
+            { name: "Polinezja Francuska", symbol: "🇵🇫", region: "Oceania", type: "island" },
+            { name: "Tokelau", symbol: "🇹🇰", region: "Oceania", type: "island" },
+            { name: "Niue", symbol: "🇳🇺", region: "Oceania", type: "island" },
+            { name: "Pitcairn", symbol: "🇵🇳", region: "Oceania", type: "island" },
+            { name: "Samoa Amerykańskie", symbol: "🇦🇸", region: "Oceania", type: "island" },
+            { name: "Wyspy Cooka", symbol: "🇨🇰", region: "Oceania", type: "island" },
+            { name: "Wallis i Futuna", symbol: "🇼🇫", region: "Oceania", type: "island" },
+            { name: "Nowa Kaledonia", symbol: "🇳🇨", region: "Oceania", type: "island" },
         ]);
         // ------------------
 
@@ -679,86 +858,6 @@
                 document.getElementById('langDropdown').style.display = 'none';
             }
         });
-
-        // Dodajemy obiekt tłumaczeń
-        const i18n = {
-            pl: {
-                nav: { start: "START", about: "O PROJEKCIE", opinions: "OPINIE" },
-                mainTitle: "Wybierz Kategorię Quizu",
-                difficultyTitle: "Wybierz poziom trudności",
-                categoryMap: {
-                    "Kraje (Flagi)": "Kraje (Flagi)"
-                },
-                difficulties: {
-                    easy: "Łatwy",
-                    medium: "Średni",
-                    hard: "Trudny",
-                    very: "Bardzo trudny"
-                },
-                questionPrompt: "Jaki symbol reprezentuje:",
-                feedback: {
-                    correct: "Poprawna odpowiedź!",
-                    incorrectPrefix: "Błędnie. Poprawny symbol: "
-                },
-                summaryBackToMenu: "Powrót do menu",
-                summaryTryAgain: "Zagraj ponownie",
-                loadingOpinions: "Ładowanie opinii...",
-                noOpinions: "Brak opinii. Bądź pierwszy!",
-                alertEmptyOpinion: "Proszę napisać swoją opinię przed wysłaniem.",
-                alertThankYou: "Dziękujemy za opinię!",
-                alertOpinionError: "Wystąpił błąd podczas zapisywania opinii.",
-                aboutHTML: `
-                    <h2>O projekcie</h2>
-                    <p>Prosty quiz edukacyjny uczący rozpoznawania flag krajów. Aplikacja obsługuje wiele poziomów trudności i zapis opinii użytkowników.</p>
-                    <p>Wersja językowa dostępna w polskim i angielskim.</p>
-                `,
-                opinionsForm: {
-                    header: "Opinie użytkowników",
-                    shareHeading: "Podziel się swoją opinią",
-                    authorPlaceholder: "Twoje imię (opcjonalnie)",
-                    textPlaceholder: "Napisz opinię...",
-                    sendButton: "Wyślij opinię"
-                }
-            },
-            en: {
-                nav: { start: "START", about: "ABOUT", opinions: "OPINIONS" },
-                mainTitle: "Choose Quiz Category",
-                difficultyTitle: "Choose difficulty level",
-                categoryMap: {
-                    "Kraje (Flagi)": "Countries (Flags)"
-                },
-                difficulties: {
-                    easy: "Easy",
-                    medium: "Medium",
-                    hard: "Hard",
-                    very: "Very Hard"
-                },
-                questionPrompt: "Which symbol represents:",
-                feedback: {
-                    correct: "Correct answer!",
-                    incorrectPrefix: "Incorrect. Correct symbol: "
-                },
-                summaryBackToMenu: "Back to menu",
-                summaryTryAgain: "Try again",
-                loadingOpinions: "Loading opinions...",
-                noOpinions: "No opinions yet. Be the first!",
-                alertEmptyOpinion: "Please write your opinion before sending.",
-                alertThankYou: "Thanks for your opinion!",
-                alertOpinionError: "Error while saving your opinion.",
-                aboutHTML: `
-                    <h2>About this project</h2>
-                    <p>A simple educational quiz for recognizing country flags. Supports multiple difficulty levels and user opinions.</p>
-                    <p>Language versions available: Polish and English.</p>
-                `,
-                opinionsForm: {
-                    header: "User opinions",
-                    shareHeading: "Share your opinion",
-                    authorPlaceholder: "Your name (optional)",
-                    textPlaceholder: "Write your opinion...",
-                    sendButton: "Send opinion"
-                }
-            }
-        };
 
         let currentLanguage = 'pl';
 
