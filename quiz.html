@@ -203,6 +203,18 @@
             color: #f1c40f;
         }
 
+        /* Dodany styl dla krótkiego komunikatu przy zmianie języka */
+        .lang-notice {
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: rgba(241, 196, 15, 0.12);
+            color: #f1c40f;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+        }
+
         /* Styl dla przycisków w głównym menu (#menu) - identyczny wygląd jak opcje quizu */
         #menu button {
             display: block;
@@ -240,6 +252,8 @@
                 <button onclick="setLanguage('pl')">Polski</button>
                 <button onclick="setLanguage('en')">English</button>
             </div>
+            <!-- Krótki widoczny komunikat informujący o zmianie języka -->
+            <div id="langNotice" class="lang-notice" role="status" aria-live="polite"></div>
         </div>
 
         <div class="main-nav">
@@ -663,8 +677,20 @@
         }
 
         function loadQuestion() {
+            // bezpieczne tłumaczenia (fallback)
+            const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {
+                mainTitle: 'Koniec Quizu!',
+                summaryBackToMenu: 'Powrót',
+                summaryTryAgain: 'Jeszcze raz',
+                loadingOpinions: 'Ładowanie opinii...',
+                noOpinions: 'Brak opinii',
+                alertEmptyOpinion: 'Wpisz opinię',
+                alertThankYou: 'Dziękujemy!',
+                alertOpinionError: 'Błąd przy wysyłaniu opinii',
+            };
+
             if (currentQuestionIndex >= totalQuestions) {
-                questionTextElement.textContent = i18n[currentLanguage].mainTitle; // or "Koniec Quizu!"
+                questionTextElement.textContent = t.mainTitle; // lub "Koniec Quizu!"
                 symbolDisplayElement.textContent = "🎉";
                 let wrongCount = totalQuestions - score;
                 let summaryHtml = `<div style="text-align:left;">
@@ -674,7 +700,6 @@
                 let allAnswers = [];
                 for (let i = 0; i < totalQuestions; i++) {
                     const q = currentQuizData[i];
-                    // Szukamy czy była błędna odpowiedź dla tego pytania
                     const wrong = incorrectAnswers.find(item => item.name === q.name);
                     if (wrong) {
                         allAnswers.push({
@@ -716,8 +741,8 @@
                 summaryHtml += `</tbody></table>`;
 
                 summaryHtml += `<div style="margin-top:12px;">
-                    <button onclick="showSection('menu')" style="margin-right:8px;">${i18n[currentLanguage].summaryBackToMenu}</button>
-                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">${i18n[currentLanguage].summaryTryAgain}</button>
+                    <button onclick="showSection('menu')" style="margin-right:8px;">${t.summaryBackToMenu}</button>
+                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}')">${t.summaryTryAgain}</button>
                 </div>
                 </div>`;
 
@@ -759,18 +784,23 @@
         }
         
         function checkAnswer(clickedButton, selectedSymbol, correctAnswerSymbol, questionName) {
+            // bezpieczne tłumaczenia (fallback)
+            const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {
+                feedback: { correct: 'Poprawna odpowiedź!', incorrectPrefix: 'Niepoprawna. Poprawna: ' }
+            };
+
             Array.from(optionsContainer.children).forEach(button => {
                 button.disabled = true;
             });
             symbolDisplayElement.textContent = correctAnswerSymbol;
 
             if (selectedSymbol === correctAnswerSymbol) {
-                feedbackElement.textContent = i18n[currentLanguage].feedback.correct;
+                feedbackElement.textContent = t.feedback.correct;
                 feedbackElement.className = "feedback correct";
                 clickedButton.style.backgroundColor = "#2ecc71";
                 score++;
             } else {
-                feedbackElement.textContent = i18n[currentLanguage].feedback.incorrectPrefix + correctAnswerSymbol;
+                feedbackElement.textContent = (t.feedback.incorrectPrefix || 'Niepoprawna. Poprawna: ') + correctAnswerSymbol;
                 feedbackElement.className = "feedback incorrect";
                 clickedButton.style.backgroundColor = "#e74c3c";
                 Array.from(optionsContainer.children).forEach(button => {
@@ -909,6 +939,14 @@
              document.getElementById('navAbout').textContent = (t.nav && t.nav.about) ? t.nav.about : 'O PROJEKCIE';
              document.getElementById('navOpinions').textContent = (t.nav && t.nav.opinions) ? t.nav.opinions : 'OPINIE';
              document.getElementById('langBtn').textContent = (lang === 'pl') ? 'PL ▾' : 'EN ▾';
+
+             // Krótkie powiadomienie o zmianie języka
+             const notice = document.getElementById('langNotice');
+             notice.textContent = (lang === 'pl') ? 'Język ustawiony: Polski' : 'Language set: English';
+             notice.style.display = 'block';
+             // automatyczne zniknięcie po chwili
+             clearTimeout(window._langNoticeTimeout);
+             window._langNoticeTimeout = setTimeout(() => { notice.style.display = 'none'; }, 1500);
  
              // Update mainTitle if on menu
              if (document.getElementById('menu').style.display !== 'none') {
@@ -946,7 +984,7 @@
                 }
             }
          }
- 
+
         // Uruchomienie menu przy ładowaniu strony i ustawienie domyślnego języka
         window.onload = () => {
             // najpierw ustaw język (tłumaczenia), potem pokaż menu — zapobiega "pustym" etykietom
