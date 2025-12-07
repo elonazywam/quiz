@@ -744,56 +744,17 @@
                 document.getElementById('mapQuizMode').style.display = 'none';
                 
                 let wrongCount = totalQuestions - score;
-                let summaryHtml = `<div style="text-align:left;">
-                    <p>Twoje wyniki: <strong>${score}</strong> poprawnych, <strong>${wrongCount}</strong> błędnych (z ${totalQuestions}).</p>`;
-
-                let allAnswers = [];
-                for (let i = 0; i < totalQuestions; i++) {
-                    const q = currentQuizData[i];
-                    const wrong = incorrectAnswers.find(item => item.name === q.name);
-                    if (wrong) {
-                        allAnswers.push({
-                            name: q.name,
-                            selected: wrong.selected,
-                            correct: q.symbol,
-                            isCorrect: false
-                        });
-                    } else {
-                        allAnswers.push({
-                            name: q.name,
-                            selected: q.symbol,
-                            correct: q.symbol,
-                            isCorrect: true
-                        });
-                    }
-                }
-
-                summaryHtml += `<table style="width:100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Pytanie</th>
-                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Twoja odpowiedź</th>
-                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Poprawna odpowiedź</th>
-                            <th style="border-bottom:1px solid #ccc; text-align:left; padding:6px;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                allAnswers.forEach(item => {
-                    summaryHtml += `<tr>
-                        <td style="padding:6px; border-top:1px solid #eee;">${item.name}</td>
-                        <td style="padding:6px; border-top:1px solid #eee;">${item.selected}</td>
-                        <td style="padding:6px; border-top:1px solid #eee;">${item.correct}</td>
-                        <td style="padding:6px; border-top:1px solid #eee; color:${item.isCorrect ? '#2ecc71' : '#e74c3c'};">
-                            ${item.isCorrect ? '✔️' : '❌'}
-                        </td>
-                    </tr>`;
-                });
-                summaryHtml += `</tbody></table>`;
-
-                summaryHtml += `<div style="margin-top:12px;">
-                    <button onclick="showSection('menu')" style="margin-right:8px;">${t.summaryBackToMenu}</button>
-                    <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}', ${mapMode})">${t.summaryTryAgain}</button>
-                </div>
+                let summaryHtml = `<div style="text-align:center;">
+                    <p style="font-size: 20px; margin-bottom: 20px;">
+                        <strong>Twoje wyniki:</strong><br>
+                        ✔️ ${score} poprawnych<br>
+                        ❌ ${wrongCount} błędnych<br>
+                        (z ${totalQuestions} pytań)
+                    </p>
+                    <div style="margin-top:20px;">
+                        <button onclick="showSection('menu')" style="margin-right:8px; padding: 10px 20px; font-size: 16px;">${t.summaryBackToMenu}</button>
+                        <button onclick="startQuiz('${lastCategory}', '${lastDifficulty}', ${mapMode})" style="padding: 10px 20px; font-size: 16px;">${t.summaryTryAgain}</button>
+                    </div>
                 </div>`;
 
                 optionsContainer.innerHTML = summaryHtml;
