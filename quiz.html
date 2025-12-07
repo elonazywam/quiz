@@ -605,6 +605,7 @@
             mainTitle.textContent = i18n[currentLanguage].difficultyTitle;
             lastCategory = categoryName; // save internal category key
             menuContainer.innerHTML = '';
+            document.getElementById('logoImage').style.display = 'none';
 
             // difficulty keys (internal) mapped to labels
             const keys = ['easy','medium','hard','very'];
@@ -627,7 +628,7 @@
                     currentPool = allFlags.slice();
                 } else if (difficultyKey === 'medium') {
                     currentPool = allFlags.filter(f => f.region === 'Europe');
-                } else {
+                } else { // easy
                     currentPool = allQuizData["Kraje (Flagi)"].slice();
                 }
                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
@@ -643,6 +644,7 @@
             document.getElementById('logoImage').style.display = 'none';
             menuContainer.style.display = 'none';
             aboutContent.style.display = 'none';
+            document.getElementById('opinionsContent').style.display = 'none';
             quizContent.style.display = 'block';
             loadQuestion();
         }
@@ -921,7 +923,7 @@
             if (qp) qp.textContent = t.questionPrompt || 'Jaki symbol reprezentuje:';
 
             // If currently showing difficulty menu, regenerate it in selected language
-            if (document.getElementById('menu').style.display !== 'none' && mainTitle.textContent === (t.difficultyTitle || 'Wybierz poziom')) {
+            if (document.getElementById('menu').style.display !== 'none' && mainTitle.textContent.includes('poziom')) {
                 if (lastCategory) showDifficulty(lastCategory);
             }
         }
