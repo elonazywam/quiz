@@ -612,6 +612,14 @@
                 button.textContent = (t.categoryMap && t.categoryMap[categoryName]) ? t.categoryMap[categoryName] : categoryName;
                 button.onclick = () => showDifficulty(categoryName);
                 menuContainer.appendChild(button);
+
+                // DODANE: jeśli to kategoria "Kraje (Flagi)" dodajemy drugi przycisk "Praca z mapą"
+                if (categoryName === "Kraje (Flagi)") {
+                    const mapBtn = document.createElement('button');
+                    mapBtn.textContent = (t.mapWork && t.mapWork.label) ? t.mapWork.label : 'Praca z mapą';
+                    mapBtn.onclick = () => showMapDifficulty(categoryName);
+                    menuContainer.appendChild(mapBtn);
+                }
             });
         }
 
