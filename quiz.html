@@ -556,6 +556,8 @@
         let incorrectAnswers = [];  // zbieramy obiekty { name, selected, correct }
         let lastCategory = null;
         let lastDifficulty = null;
+        let lastIsMap = false; // czy byliśmy w widoku "Praca z mapą"
+        let mapMode = false;    // tryb quizu oparty na mapie (ustawiany przy starcie)
 
         // Elementy DOM
         const menuContainer = document.getElementById('menu');
@@ -624,6 +626,7 @@
         }
 
         function showDifficulty(categoryName) {
+            lastIsMap = false;
             // Bezpieczne pobranie tłumaczeń (fallback gdy i18n/brak języka)
             const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
             mainTitle.textContent = t.difficultyTitle || 'Wybierz poziom trudności';
@@ -646,21 +649,46 @@
             });
         }
 
-        function startQuiz(categoryName, difficultyKey) {
+        // Pokazuje wybór poziomu dla trybu "Praca z mapą"
+        function showMapDifficulty(categoryName) {
+            lastIsMap = true;
+            // Bezpieczne pobranie tłumaczeń (fallback)
+            const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
+            mainTitle.textContent = (t.mapWork && t.mapWork.title) ? t.mapWork.title : 'Praca z mapą - Wybierz poziom';
             lastCategory = categoryName;
-            lastDifficulty = difficultyKey; // save internal key
-            // Zmieniona logika poziomów:
-            // medium -> Europa, hard -> wszystkie kraje, very -> wyspy
-            if (categoryName === "Kraje (Flagi)") {
-                if (difficultyKey === 'very') {
-                    currentPool = allFlagsExtended.filter(item => item.type === "island");
-                } else if (difficultyKey === 'hard') {
-                    currentPool = allFlags.slice();
-                } else { // medium
-                    currentPool = allFlags.filter(f => f.region === 'Europe');
-                }
-                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
-            }
+            menuContainer.innerHTML = '';
+            document.getElementById('logoImage').style.display = 'none';
+
+            const keys = ['medium','hard','very'];
+            keys.forEach(key => {
+                const btn = document.createElement('button');
+                let label;
+                if (key === 'very') label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Trudny';
+                else if (key === 'hard') label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Średni';
+                else label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key] : 'Łatwy';
+                btn.textContent = label;
+                // uruchamiamy quiz w trybie mapy (useMap = true)
+                btn.onclick = () => startQuiz(categoryName, key, true);
+                menuContainer.appendChild(btn);
+            });
+        }
+
+        function startQuiz(categoryName, difficultyKey, useMap = false) {
+            mapMode = !!useMap;
+             lastCategory = categoryName;
+             lastDifficulty = difficultyKey; // save internal key
+             // Zmieniona logika poziomów:
+             // medium -> Europa, hard -> wszystkie kraje, very -> wyspy
+             if (categoryName === "Kraje (Flagi)") {
+                 if (difficultyKey === 'very') {
+                     currentPool = allFlagsExtended.filter(item => item.type === "island");
+                 } else if (difficultyKey === 'hard') {
+                     currentPool = allFlags.slice();
+                 } else { // medium
+                     currentPool = allFlags.filter(f => f.region === 'Europe');
+                 }
+                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
+             }
              shuffleArray(currentQuizData);
              currentQuestionIndex = 0;
              score = 0;
@@ -984,13 +1012,14 @@
             // Rebuild widoczne menu / wybór poziomu w nowym języku
             if (document.getElementById('menu').style.display !== 'none') {
                 if (lastCategory) {
-                    // jesteśmy w widoku wyboru poziomu - odtwórz go w nowym języku
-                    showDifficulty(lastCategory);
+                    // jeśli byliśmy w widoku "Praca z mapą" - odtwórz właściwy widok wyboru poziomu
+                    if (lastIsMap) showMapDifficulty(lastCategory);
+                    else showDifficulty(lastCategory);
                 } else {
                     // jesteśmy w głównym menu kategorii - odtwórz etykiety
                     showMenu();
                 }
-            }
+             }
          }
 
         // Uruchomienie menu przy ładowaniu strony i ustawienie domyślnego języka
