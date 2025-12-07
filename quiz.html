@@ -602,16 +602,20 @@
         }
 
         function showDifficulty(categoryName) {
-            mainTitle.textContent = i18n[currentLanguage].difficultyTitle;
+            // Bezpieczne pobranie tłumaczeń (fallback gdy i18n/brak języka)
+            const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
+            mainTitle.textContent = t.difficultyTitle || 'Wybierz poziom trudności';
             lastCategory = categoryName; // save internal category key
             menuContainer.innerHTML = '';
             document.getElementById('logoImage').style.display = 'none';
 
-            // difficulty keys (internal) mapped to labels
+            // difficulty keys (internal) mapped to labels (z fallbackami)
             const keys = ['easy','medium','hard','very'];
             keys.forEach(key => {
                 const btn = document.createElement('button');
-                btn.textContent = i18n[currentLanguage].difficulties[key];
+                const label = (t.difficulties && t.difficulties[key]) ? t.difficulties[key]
+                    : (key === 'very' ? 'Bardzo trudny' : key === 'hard' ? 'Trudny' : key === 'medium' ? 'Średni' : 'Łatwy');
+                btn.textContent = label;
                 btn.onclick = () => startQuiz(categoryName, key);
                 menuContainer.appendChild(btn);
             });
@@ -620,33 +624,37 @@
         function startQuiz(categoryName, difficultyKey) {
             lastCategory = categoryName;
             lastDifficulty = difficultyKey; // save internal key
-            // Wybór puli pytań zależnie od kategorii i poziomu trudności (używamy kluczy)
-            if (categoryName === "Kraje (Flagi)") {
-                if (difficultyKey === 'very') {
-                    currentPool = allFlagsExtended.filter(item => item.type === "island");
-                } else if (difficultyKey === 'hard') {
-                    currentPool = allFlags.slice();
-                } else if (difficultyKey === 'medium') {
-                    currentPool = allFlags.filter(f => f.region === 'Europe');
-                } else { // easy
-                    currentPool = allQuizData["Kraje (Flagi)"].slice();
-                }
-                currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
-            }
-            shuffleArray(currentQuizData);
-            currentQuestionIndex = 0;
-            score = 0;
-            totalQuestions = Math.min(10, currentQuizData.length);
-            answeredCount = 0;
-            incorrectAnswers = [];
+             // Wybór puli pytań zależnie od kategorii i poziomu trudności (używamy kluczy)
+             if (categoryName === "Kraje (Flagi)") {
+                 if (difficultyKey === 'very') {
+                     currentPool = allFlagsExtended.filter(item => item.type === "island");
+                 } else if (difficultyKey === 'hard') {
+                     currentPool = allFlags.slice();
+                 } else if (difficultyKey === 'medium') {
+                     currentPool = allFlags.filter(f => f.region === 'Europe');
+                 } else { // easy
+                     currentPool = allQuizData["Kraje (Flagi)"].slice();
+                 }
+                 currentQuizData = currentPool.map(item => ({ name: item.name, symbol: item.symbol, type: item.type }));
+             }
+             shuffleArray(currentQuizData);
+             currentQuestionIndex = 0;
+             score = 0;
+             totalQuestions = Math.min(10, currentQuizData.length);
+             answeredCount = 0;
+             incorrectAnswers = [];
 
-            mainTitle.textContent = `${i18n[currentLanguage].categoryMap[categoryName] || categoryName} - Poziom: ${i18n[currentLanguage].difficulties[difficultyKey]}`;
-            document.getElementById('logoImage').style.display = 'none';
-            menuContainer.style.display = 'none';
-            aboutContent.style.display = 'none';
-            document.getElementById('opinionsContent').style.display = 'none';
-            quizContent.style.display = 'block';
-            loadQuestion();
+            // Bezpieczne etykiety kategorii / poziomu (fallback gdy brak tłumaczeń)
+            const t = (window.i18n && window.i18n[currentLanguage]) ? window.i18n[currentLanguage] : {};
+            const catLabel = (t.categoryMap && t.categoryMap[categoryName]) ? t.categoryMap[categoryName] : categoryName;
+            const diffLabel = (t.difficulties && t.difficulties[difficultyKey]) ? t.difficulties[difficultyKey] : difficultyKey;
+            mainTitle.textContent = `${catLabel} - Poziom: ${diffLabel}`;
+             document.getElementById('logoImage').style.display = 'none';
+             menuContainer.style.display = 'none';
+             aboutContent.style.display = 'none';
+             document.getElementById('opinionsContent').style.display = 'none';
+             quizContent.style.display = 'block';
+             loadQuestion();
         }
 
         function loadQuestion() {
@@ -888,46 +896,52 @@
         let currentLanguage = 'pl';
 
         function setLanguage(lang) {
-            currentLanguage = lang;
-            const t = (window.i18n && window.i18n[lang]) ? window.i18n[lang] : {};
-
-            // Update nav buttons (safeguard przy braku tłumaczeń)
-            document.getElementById('navStart').textContent = (t.nav && t.nav.start) ? t.nav.start : 'START';
-            document.getElementById('navAbout').textContent = (t.nav && t.nav.about) ? t.nav.about : 'O PROJEKCIE';
-            document.getElementById('navOpinions').textContent = (t.nav && t.nav.opinions) ? t.nav.opinions : 'OPINIE';
-            document.getElementById('langBtn').textContent = (lang === 'pl') ? 'PL ▾' : 'EN ▾';
-
-            // Update mainTitle if on menu
+             currentLanguage = lang;
+             const t = (window.i18n && window.i18n[lang]) ? window.i18n[lang] : {};
+ 
+             // Update nav buttons (safeguard przy braku tłumaczeń)
+             document.getElementById('navStart').textContent = (t.nav && t.nav.start) ? t.nav.start : 'START';
+             document.getElementById('navAbout').textContent = (t.nav && t.nav.about) ? t.nav.about : 'O PROJEKCIE';
+             document.getElementById('navOpinions').textContent = (t.nav && t.nav.opinions) ? t.nav.opinions : 'OPINIE';
+             document.getElementById('langBtn').textContent = (lang === 'pl') ? 'PL ▾' : 'EN ▾';
+ 
+             // Update mainTitle if on menu
+             if (document.getElementById('menu').style.display !== 'none') {
+                 document.getElementById('mainTitle').textContent = t.mainTitle || 'Wybierz Kategorię Quizu';
+             }
+ 
+             // Update static content: about (fallback jeżeli brak treści)
+             document.getElementById('aboutContent').innerHTML = t.aboutHTML || '<p style="color:#bdc3c7;">Brak treści do wyświetlenia</p>';
+ 
+             // opinionsContent: build form + opinionsList container (safeguard z fallbackami)
+             const of = t.opinionsForm || {};
+             document.getElementById('opinionsContent').innerHTML = `
+                 <h2>${of.header || 'Podziel się opinią'}</h2>
+                 <div style="background-color: rgba(100, 100, 100, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                     <h3>${of.shareHeading || 'Napisz opinię'}</h3>
+                     <input type="text" id="opinionAuthor" placeholder="${of.authorPlaceholder || 'Autor (opcjonalnie)'}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box;">
+                     <textarea id="opinionText" placeholder="${of.textPlaceholder || 'Twoja opinia...'}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box; min-height: 80px; font-family: Arial, sans-serif;"></textarea>
+                     <button onclick="addOpinion()" style="width: 100%; padding: 10px; background-color: #f1c40f; color: #2c3e50; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px;">${of.sendButton || 'Wyślij'}</button>
+                 </div>
+                 <div id="opinionsList" style="max-height: 400px; overflow-y: auto;"></div>
+             `;
+ 
+             // Update question prompt
+             const qp = document.getElementById('questionPrompt');
+             if (qp) qp.textContent = t.questionPrompt || 'Jaki symbol reprezentuje:';
+ 
+            // Rebuild widoczne menu / wybór poziomu w nowym języku
             if (document.getElementById('menu').style.display !== 'none') {
-                document.getElementById('mainTitle').textContent = t.mainTitle || 'Wybierz Kategorię Quizu';
+                if (lastCategory) {
+                    // jesteśmy w widoku wyboru poziomu - odtwórz go w nowym języku
+                    showDifficulty(lastCategory);
+                } else {
+                    // jesteśmy w głównym menu kategorii - odtwórz etykiety
+                    showMenu();
+                }
             }
-
-            // Update static content: about (fallback jeżeli brak treści)
-            document.getElementById('aboutContent').innerHTML = t.aboutHTML || '<p style="color:#bdc3c7;">Brak treści do wyświetlenia</p>';
-
-            // opinionsContent: build form + opinionsList container (safeguard z fallbackami)
-            const of = t.opinionsForm || {};
-            document.getElementById('opinionsContent').innerHTML = `
-                <h2>${of.header || 'Podziel się opinią'}</h2>
-                <div style="background-color: rgba(100, 100, 100, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3>${of.shareHeading || 'Napisz opinię'}</h3>
-                    <input type="text" id="opinionAuthor" placeholder="${of.authorPlaceholder || 'Autor (opcjonalnie)'}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box;">
-                    <textarea id="opinionText" placeholder="${of.textPlaceholder || 'Twoja opinia...'}" style="width: 100%; padding: 8px; margin: 10px 0; border: none; border-radius: 4px; box-sizing: border-box; min-height: 80px; font-family: Arial, sans-serif;"></textarea>
-                    <button onclick="addOpinion()" style="width: 100%; padding: 10px; background-color: #f1c40f; color: #2c3e50; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px;">${of.sendButton || 'Wyślij'}</button>
-                </div>
-                <div id="opinionsList" style="max-height: 400px; overflow-y: auto;"></div>
-            `;
-
-            // Update question prompt
-            const qp = document.getElementById('questionPrompt');
-            if (qp) qp.textContent = t.questionPrompt || 'Jaki symbol reprezentuje:';
-
-            // If currently showing difficulty menu, regenerate it in selected language
-            if (document.getElementById('menu').style.display !== 'none' && mainTitle.textContent.includes('poziom')) {
-                if (lastCategory) showDifficulty(lastCategory);
-            }
-        }
-
+         }
+ 
         // Uruchomienie menu przy ładowaniu strony i ustawienie domyślnego języka
         window.onload = () => {
             // najpierw ustaw język (tłumaczenia), potem pokaż menu — zapobiega "pustym" etykietom
